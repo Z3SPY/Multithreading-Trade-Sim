@@ -12,7 +12,6 @@
 }
 
 
-
 .userField, .passField {
     -fx-padding: 5px 5px;
     -fx-font-family: "Post No Bills Colombo";
@@ -20,4 +19,37 @@
     -fx-background-color: transparent;
     -fx-border-color: #FF6600; 
     -fx-text-fill: #FF6600;
+}
+
+.add-text {
+    -fx-padding: 5px 5px;
+    -fx-font-family: "Post No Bills Colombo";
+    -fx-font-size: 16px;
+    -fx-text-fill: #FF6600;
+}
+
+.login-btn {
+    -fx-font-family: "Post No Bills Colombo";
+    -fx-background-color: #FF6600; 
+    -fx-text-fill: #1E1E1E; 
+    -fx-font-weight: bold;
+    -fx-font-size: 19px;
+
+}
+
+.lower-btn {
+   -fx-fill: #1E1E1E; /* Text color */
+   -fx-text-fill: #FF6600;
+   -fx-font-family: "Post No Bills Colombo";
+   -fx-background-color: #1E1E1E;
+   -fx-font-size: 20px;
+}
+
+.bottomNav {
+    -fx-padding: 5;
+    -fx-border-color: #FF6600;
+    -fx-border-insets: 5;
+    -fx-border-width: 3;
+    -fx-border-style: solid;
+
 }
