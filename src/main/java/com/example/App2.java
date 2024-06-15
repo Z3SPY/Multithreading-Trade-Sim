@@ -4,12 +4,16 @@ import java.io.IOException;
 import java.net.URL;
 
 import javafx.application.Application;
+import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 
@@ -22,40 +26,52 @@ public class App2 extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        double width = 500;
-        double height = 500;
+        Screen screen = Screen.getPrimary();
+
+        Rectangle2D bounds = screen.getVisualBounds();
 
 
-        Group grp = new Group();
+        /* SPACINGS AND SIZING */
+        double width = bounds.getWidth() * .4;
+        double height =  bounds.getHeight() * .6;
 
-        Rectangle border = new Rectangle(width * .97, height * .97);
-        border.setTranslateY(height * .015);
-        border.setTranslateX(width * .015);
-        border.setFill(null);
-        border.setStroke(Color.web("EEEEEE", 1.0));
-        border.setStrokeWidth(2);
-
-
-        /* TITLE TEXT */
-        double titleBgX = width * .5; 
+        /* RECTANGLE AND TITLE SIZING */
+        double titleBgX = width * .4; 
         double titleBgY = 45;
-        double titleBGXpos = width * .25;
+        double titleBGXpos = width * .30;
 
-        Group titleGroup = new Group();
-        Rectangle titleBg = new Rectangle(titleBgX, titleBgY);
-        titleBg.setFill(Color.web("DC5F00", 1.0));
-        titleBg.setTranslateX(titleBGXpos);
-        titleBg.setTranslateY(20);
 
-        Text t = new Text(titleBGXpos + (titleBgX *.10) - 10, 50, "WELCOME TO ISTO");
-        //t.setFont(new Font(25));
-        t.getStyleClass().add("my-text"); // Apply CSS class
-        //t.setFont(Font.font("Verdana", 25)); 
-        titleGroup.getChildren().addAll( titleBg, t);
+
+        /* SPACINGS AND SIZING END */
         
-        
+        /* STACK PANE FOR CENTERING */
+        StackPane stackPane = new StackPane();
+            stackPane.setPrefSize(width, height *.5); // Set preferred size for StackPane
+            stackPane.setStyle("-fx-background-color: #1E1E1E"); // Set scene background color
 
-        grp.getChildren().addAll(border, titleGroup);
+        Rectangle backgroundRect = new Rectangle(titleBgX, titleBgY);
+            backgroundRect.setFill(Color.web("#DC5F00"));
+
+        // Create a text node
+        Text text = new Text("WELCOME TO ISTO");
+            text.getStyleClass().add("my-text"); // Apply CSS class for styling
+            // Add nodes to StackPane
+            stackPane.getChildren().addAll(backgroundRect, text);
+            stackPane.setAlignment(Pos.CENTER);
+
+
+        /* MAIN GROUP */
+        Group grp = new Group();
+        Rectangle border = new Rectangle(width * .97, height * .97);
+            border.setTranslateY(height * .015);
+            border.setTranslateX(width * .015);
+            border.setFill(null);
+            border.setStroke(Color.web("EEEEEE", 1.0));
+            border.setStrokeWidth(2);
+
+
+        /* FINISHING TOUCHES */
+        grp.getChildren().addAll(stackPane, border);
         scene = new Scene(grp, width, height);
         scene.setFill(Color.web("1E1E1E", 1.0));
         

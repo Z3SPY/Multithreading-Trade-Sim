@@ -3,8 +3,21 @@
 .my-text {
     -fx-font-file: url('/target/classes/com/example/fonts/Post No Bills Colombo.ttf'); /* Specify the path to your font file */
     -fx-font-family: "Post No Bills Colombo";
-    -fx-font-size: 20px;
+    -fx-font-size: 30px;
     -fx-fill: #1E1E1E; /* Text color */
     -fx-font-weight: bold;
     -fx-text-alignment: center;
+    -fx-background-color: #FF6600; 
+    -fx-padding: 0 50px;
+}
+
+
+
+.userField, .passField {
+    -fx-padding: 5px 5px;
+    -fx-font-family: "Post No Bills Colombo";
+    -fx-font-size: 20px;
+    -fx-background-color: transparent;
+    -fx-border-color: #FF6600; 
+    -fx-text-fill: #FF6600;
 }
