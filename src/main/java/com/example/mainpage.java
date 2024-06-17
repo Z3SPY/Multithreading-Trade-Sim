@@ -88,17 +88,25 @@ public class mainpage extends Application {
         grid.add(shkBox, 4, 2, 1, 1);
 
         // Bottom left section
+        // Main
         StackPane bottomLeft = new StackPane();
         bottomLeft.getStyleClass().add("stackpane-bottom-left");
-        grid.add(bottomLeft, 0, 3, 4, 6);
+        grid.add(bottomLeft, 0, 3, 4, 4);
+
+
+        
 
         // Bottom right section
         GridPane bottomRightGrid = new GridPane();
+        bottomRightGrid.setVgap(10);
+
+        
         for (int i = 0; i < 5; i++) {
             RowConstraints rc = new RowConstraints();
             rc.setPercentHeight(20); // Each row in the bottom right grid gets 20% height
             bottomRightGrid.getRowConstraints().add(rc);
         }
+        
         ColumnConstraints cc = new ColumnConstraints();
         cc.setPercentWidth(100); // Only one column that takes 100% width
         bottomRightGrid.getColumnConstraints().add(cc);
@@ -116,7 +124,7 @@ public class mainpage extends Application {
         grid.add(bottomRightGrid, 4, 3, 1, 3);
 
         // Set up the scene and stage
-        Scene scene = new Scene(grid, 750, 750);
+        Scene scene = new Scene(grid, 900, 750);
         scene.getStylesheets().add(getClass().getResource("/com/example/styles.css").toExternalForm());
         primaryStage.setTitle("ISTO SYSTEM");
         primaryStage.setScene(scene);
