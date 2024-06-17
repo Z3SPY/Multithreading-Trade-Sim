@@ -1,5 +1,6 @@
 package com.example;
 
+import javafx.animation.TranslateTransition;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -23,8 +24,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
-public class test extends Application {
+public class login extends Application {
     @Override
     public void start(Stage primaryStage) {
         // Create and style the grid pane
@@ -48,6 +50,11 @@ public class test extends Application {
         Button loginButton = new Button("LOGIN");
         loginButton.getStyleClass().add("login-btn"); // Apply CSS class for styling
         loginButton.setPrefWidth(265);
+
+        loginButton.setOnAction(event -> {
+            page newPage = new page();
+            newPage.show(primaryStage);
+        });
 
         // Create the additional welcome message
         Label additionalMessage = new Label("Welcome To the Interdimensional Space Trade Organization Terminal. Lets Make Some Space! MONEY $Y$");
@@ -89,7 +96,7 @@ public class test extends Application {
         Group myGroup = new Group();
         myGroup.getChildren().addAll(grid, welcomeLabel);
 
-        // Create the BorderPane and apply the border
+
         BorderPane borderPane = new BorderPane();
         borderPane.setStyle("-fx-background-color: #1E1E1E; -fx-padding: 10;"); // Increased padding
         borderPane.setCenter(myGroup);
@@ -102,6 +109,8 @@ public class test extends Application {
             new BorderWidths(2) // You can adjust the border width if needed
         )));
 
+
+        
         // Set up the scene and stage
         Scene scene = new Scene(borderPane, 750, 750);
         scene.getStylesheets().add(getClass().getResource("/com/example/styles.css").toExternalForm());
