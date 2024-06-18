@@ -98,11 +98,83 @@ class Player:
                         self.sell_stock(stock, self.portfolio[stock_name])
                         break
 
+class Events:
+    import random
+
+class Events:
+    def __init__(self):
+        self.event = "DEFAULT"
+
+    def generate_random_event(self, stock_list):
+        events = [
+            "WAR",
+            "INFLATION",
+            "TECHNOLOGICAL BREAKTHROUGH",
+            "ASTEROID MINING BOOM",
+            "SPACE TOURISM REGULATIONS",
+            "COLONIZATION OF MARS",
+            "TECH STOCK CRASH",
+            "ALIEN ENCOUNTER",
+            "SPACE WEATHER DISRUPTION",
+            "RESOURCE SCARCITY",
+            "SPACE PIRATE ATTACK",
+            "NOTHING NEW"
+        ]
+        self.event = random.choice(events)
+        self.affect_stock_prices(stock_list)
+
+    def affect_stock_prices(self, stock_list):
+
+        print(f"WARNING NEW EVENT: {self.event}")
+
+        for stock in stock_list:
+            if self.event == "WAR":
+                if "MILITARY" in stock.category:
+                    stock.price_fluctuation *= 1.5  # Increase fluctuation for military-related stocks
+            elif self.event == "INFLATION":
+                stock.price_fluctuation *= 0.5  # Decrease all price fluctuation
+            elif self.event == "TECHNOLOGICAL BREAKTHROUGH":
+                if "INFRA" in stock.category:
+                    stock.price_fluctuation *= 1.2  # Increase fluctuation for infrastructure stocks
+            elif self.event == "ASTEROID MINING BOOM":
+                if "COMMERCE" in stock.category:
+                    stock.price_fluctuation *= 1.3  # Increase fluctuation for commerce-related stocks
+            elif self.event == "SPACE TOURISM REGULATIONS":
+                if "COMMERCE" in stock.category:
+                    stock.price_fluctuation *= 0.8  # Decrease fluctuation for commerce-related stocks
+            elif self.event == "COLONIZATION OF MARS":
+                if "INFRA" in stock.category:
+                    stock.price_fluctuation *= 1.5  # Increase fluctuation for infrastructure stocks
+                elif "COMMERCE" in stock.category:
+                    stock.price_fluctuation *= 1.2  # Increase fluctuation for commerce-related stocks
+            elif self.event == "TECH STOCK CRASH":
+                if "TECH" in stock.category:
+                    stock.price_fluctuation *= 0.7  # Decrease fluctuation for tech-related stocks
+            elif self.event == "ALIEN ENCOUNTER":
+                if "MILITARY" in stock.category:
+                    stock.price_fluctuation *= 1.5  # Increase fluctuation for military-related stocks
+                elif "INFRA" in stock.category:
+                    stock.price_fluctuation *= 0.8  # Decrease fluctuation for infrastructure stocks
+            elif self.event == "SPACE WEATHER DISRUPTION":
+                if "INFRA" in stock.category:
+                    stock.price_fluctuation *= 0.9  # Decrease fluctuation for infrastructure stocks
+                elif "COMMERCE" in stock.category:
+                    stock.price_fluctuation *= 0.9  # Decrease fluctuation for commerce-related stocks
+            elif self.event == "RESOURCE SCARCITY":
+                if "COMMERCE" in stock.category:
+                    stock.price_fluctuation *= 0.8  # Decrease fluctuation for commerce-related stocks
+            elif self.event == "SPACE PIRATE ATTACK":
+                if "COMMERCE" in stock.category:
+                    stock.price_fluctuation *= 0.7  # Decrease fluctuation for commerce-related stocks
+            else:
+                stock.price_fluctuation = stock.price_fluctuation_base  # Reset to base fluctuation (0.02)
+
 
 class Stock:
     def __init__(self, name, price, category):
         self.stockName = name
         self.stockPrice = price
+        self.price_fluctuation_base = 0.02
         self.price_fluctuation = 0.02  # Define the price fluctuation range here
         self.category = category
 
@@ -124,24 +196,19 @@ def main():
     myStock3 = Stock("Tiki Torches", 120, "COMMERCE")
     myStock4 = Stock("Space Worm Jelly", 2000, "COMMERCE")
     myStock5 = Stock("Stone Pick Axe", 10, "INFRA")
+    
+    EventSystem = Events()
 
+    count = 0
+    tick_limit = 40  # Number of ticks before generating a new event
     Space_NasDaq = [myStock1, myStock2, myStock3, myStock4, myStock5]
 
     stop_flag = False
-    print("Press '1' to stop...")
-
-    """def on_press(event):
-        nonlocal stop_flag
-        if event.name == '.':
-            stop_flag = True
-    
-    # Registering the on_press callback
-    keyboard.on_press_key('.', on_press)"""
     
     while not stop_flag:
-        for stocks in Space_NasDaq:
-            stocks.simulate_stock_price(stocks.stockPrice)
-            print(stocks.display())
+        for stock in Space_NasDaq:
+            stock.simulate_stock_price(stock.stockPrice)
+            print(stock.display())
 
         print(f"Cash balance: ${player.cash_balance:.2f}")
         print(f"Portfolio: {player.portfolio}")
@@ -151,7 +218,13 @@ def main():
 
         player.simulate(Space_NasDaq)
         time.sleep(1)
-    
+        
+        count += 1
+        print(f"TICKS TILL NEXT EVENT {tick_limit - count}")
+        
+        if count >= tick_limit:
+            EventSystem.generate_random_event(Space_NasDaq)
+            count = 0  # Reset the count after generating an event
 
 if __name__ == "__main__":
     main()
