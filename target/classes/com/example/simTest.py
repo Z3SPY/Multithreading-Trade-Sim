@@ -18,6 +18,12 @@ class Player:
     
     def simulate(self, stockList):
         print(self.portfolio)
+        if len(self.portfolio) >= 1:
+            # Increase uncertainty at a random rate for each stock
+            self.increase_uncertainty()
+            # Decide whether to sell based on uncertainty level
+            self.check_uncertainty_and_sell(stockList)
+
         if len(self.portfolio) <= 3:
             choice = stockList[random.randint(0, len(stockList) - 1)]
             if self.buy_stock(choice, random.randint(1, 20)):
@@ -26,12 +32,6 @@ class Player:
             if not self.buy_stock(choice, random.randint(1, 20)):
                 print("2")
                 return
-        
-        # Increase uncertainty at a random rate for each stock
-        self.increase_uncertainty()
-
-        # Decide whether to sell based on uncertainty level
-        self.check_uncertainty_and_sell(stockList)
     
     def buy_stock(self, stock, quantity):
         total_cost = stock.stockPrice * quantity
@@ -105,6 +105,15 @@ class Events:
     def __init__(self):
         self.event = "DEFAULT"
 
+    def passStockData(self, stock_list):
+        gateway = JavaGateway()  # Connect to the Java GatewayServer
+        java_app = gateway.entry_point  # Access JavaApp instance
+
+        for stock in stock_list:
+            java_app.updateStockValue(stock.stockName, stock.stockPrice)
+
+        gateway.close()  # Close the gateway connection
+
     def generate_random_event(self, stock_list):
         events = [
             "WAR",
@@ -124,8 +133,7 @@ class Events:
         self.affect_stock_prices(stock_list)
 
     def affect_stock_prices(self, stock_list):
-        gateway = JavaGateway()  # Connect to the Java GatewayServer
-        java_app = gateway.entry_point  # Access JavaApp instance
+        
 
         print(f"WARNING NEW EVENT: {self.event}")
 
@@ -171,10 +179,7 @@ class Events:
             else:
                 stock.price_fluctuation = stock.price_fluctuation_base  # Reset to base fluctuation (0.02)
 
-            # Update the JavaFX UI with the new stock value
-            java_app.updateStockValue(stock.stockName, stock.stockPrice)
-
-        gateway.close()  # Close the gateway connection
+           
 
 
 class Stock:
@@ -207,7 +212,7 @@ def main():
     EventSystem = Events()
 
     count = 0
-    tick_limit = 5  # Number of ticks before generating a new event
+    tick_limit = 40  # Number of ticks before generating a new event
     Space_NasDaq = [myStock1, myStock2, myStock3, myStock4, myStock5]
 
     stop_flag = False
@@ -229,9 +234,12 @@ def main():
         count += 1
         print(f"TICKS TILL NEXT EVENT {tick_limit - count}")
         
+        if count % 10 == 0:
+            print("poggo")
+            EventSystem.passStockData(Space_NasDaq)
         if count >= tick_limit:
             EventSystem.generate_random_event(Space_NasDaq)
             count = 0  # Reset the count after generating an event
 
-if __name__ == "__main__":
+if _name_ == "_main_":
     main()

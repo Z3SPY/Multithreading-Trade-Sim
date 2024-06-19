@@ -13,8 +13,16 @@
     -fx-fill: #1E1E1E; /* Text color */
     -fx-font-weight: bold;
     -fx-text-alignment: center;
-    -fx-background-color: #FF6600; 
+    -fx-background-color: #DC5F00; 
     -fx-padding: 0 50px;
+}
+
+.reglbl-text {
+    -fx-font-size: 25px;
+    -fx-text-fill: #DC5F00; /* Text color */
+    -fx-font-weight: bold;
+    -fx-text-alignment: center;
+    -fx-padding: 0 25px;
 }
 
 
@@ -23,20 +31,20 @@
     -fx-font-family: "Post No Bills Colombo";
     -fx-font-size: 20px;
     -fx-background-color: transparent;
-    -fx-border-color: #FF6600; 
-    -fx-text-fill: #FF6600;
+    -fx-border-color: #DC5F00; 
+    -fx-text-fill: #DC5F00;
 }
 
 .add-text {
     -fx-padding: 5px 5px;
     -fx-font-family: "Post No Bills Colombo";
     -fx-font-size: 16px;
-    -fx-text-fill: #FF6600;
+    -fx-text-fill: #DC5F00;
 }
 
-.login-btn {
+.login-btn, .register-btn {
     -fx-font-family: "Post No Bills Colombo";
-    -fx-background-color: #FF6600; 
+    -fx-background-color: #DC5F00; 
     -fx-text-fill: #1E1E1E; 
     -fx-font-weight: bold;
     -fx-font-size: 19px;
@@ -45,7 +53,7 @@
 
 .lower-btn {
    -fx-fill: #1E1E1E; /* Text color */
-   -fx-text-fill: #FF6600;
+   -fx-text-fill: #DC5F00;
    -fx-font-family: "Post No Bills Colombo";
    -fx-background-color: #1E1E1E;
    -fx-font-size: 20px;
@@ -53,7 +61,7 @@
 
 .bottomNav {
     -fx-padding: 5;
-    -fx-border-color: #FF6600;
+    -fx-border-color: #DC5F00;
     -fx-border-insets: 5;
     -fx-border-width: 3;
     -fx-border-style: solid;
@@ -64,18 +72,18 @@
 
 /* MAIN PAGE */
 .label-orange {
-    -fx-text-fill: #FF6600;
+    -fx-text-fill: #DC5F00;
 }
 
 .label-small {
-    -fx-text-fill: #FF6600;
+    -fx-text-fill: #DC5F00;
     -fx-font-size: 16px;
 }
 
 /* Set styles for stack panes with a specific background and border */
 .stackpane-top-left {
     -fx-background-color: #1E1E1E;
-    -fx-border-color: #FF6600;
+    -fx-border-color: #DC5F00;
     -fx-border-width: 2;
 }
 
@@ -87,7 +95,7 @@
 
 .stackpane-time, .stackpane-smiley {
     -fx-background-color: #1E1E1E;
-    -fx-border-color: #FF6600;
+    -fx-border-color: #DC5F00;
     -fx-border-width: 2;
     -fx-font-size: 32;
 
@@ -101,7 +109,7 @@
 }
 
 .stackpane-title {
-    -fx-background-color: #FF6600;
+    -fx-background-color: #DC5F00;
     -fx-text-fill: #1E1E1E;
     -fx-font-size: 30;
 
@@ -109,15 +117,15 @@
 
 .stackpane-default {
     -fx-background-color: #1E1E1E;
-    -fx-border-color: #FF6600;
+    -fx-border-color: #DC5F00;
     -fx-border-width: 2;
 }
 
 /* Set styles for HBoxes */
 .hbox-middle-left, .hbox-shk-box {
     -fx-background-color: #1E1E1E;
-    -fx-border-color: #FF6600;
-    -fx-text-fill: #FF6600;
+    -fx-border-color: #DC5F00;
+    -fx-text-fill: #DC5F00;
     -fx-border-width: 2;
     -fx-font-size: 32;
 

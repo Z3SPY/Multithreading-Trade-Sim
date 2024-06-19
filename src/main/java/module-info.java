@@ -3,6 +3,9 @@ module com.example {
     requires javafx.fxml;
     requires javafx.graphics;
     requires py4j; 
+    requires org.mongodb.driver.sync.client;
+    requires org.mongodb.bson;
+    requires org.mongodb.driver.core;
     
 
     opens com.example to javafx.fxml;
