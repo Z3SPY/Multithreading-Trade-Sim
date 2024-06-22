@@ -1,28 +1,31 @@
 package com.example;
 
+import java.io.File;
 import javafx.application.Application;
-import javafx.scene.Group;
-import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
-import javafx.scene.paint.Color;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
 public class test extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        // Create a Planet object
-        Planet planet = new Planet(100);
-        planet.setPos(300, 100);
+        // Load the image
+        Image image = new Image(new File("src\\main\\java\\com\\example\\space.gif").toURI().toString());
+        ImageView imageView = new ImageView(image);
 
-        // Setup the scene
-        Group root = new Group(planet);
-        Scene scene = new Scene(root, 600, 400, true);
-        scene.setFill(Color.BLACK);
-        scene.setCamera(new PerspectiveCamera());
+        // Create a Pane and add the ImageView to it
+        Pane visPaneTop = new Pane();
+        visPaneTop.getChildren().addAll(imageView);
 
+        // Create a Scene with the Pane
+        Scene scene = new Scene(visPaneTop, 800, 600);
+
+        // Set the Scene to the Stage
+        primaryStage.setTitle("Image Viewer");
         primaryStage.setScene(scene);
-        primaryStage.setTitle("Rotating Pyramid");
         primaryStage.show();
     }
 
