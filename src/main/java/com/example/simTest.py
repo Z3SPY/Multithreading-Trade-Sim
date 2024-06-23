@@ -1,3 +1,4 @@
+import json
 import time
 import numpy as np
 import random
@@ -109,8 +110,14 @@ class Events:
         gateway = JavaGateway()  # Connect to the Java GatewayServer
         java_app = gateway.entry_point  # Access JavaApp instance
 
-        for stock in stock_list:
-            java_app.updateStockValue(stock.stockName, stock.stockPrice)
+        data = json.dumps([vars(obj) for obj in stock_list])
+        print(data)
+        java_app.updateStockValue(data)
+
+
+        #for stock in stock_list:
+        #    if (stock.stockName == "Space Rocks"):
+        #        java_app.updateStockValue(stock.stockName, stock.stockPrice)
 
         gateway.close()  # Close the gateway connection
 
@@ -154,9 +161,9 @@ class Events:
                     stock.price_fluctuation *= 0.8  # Decrease fluctuation for commerce-related stocks
             elif self.event == "COLONIZATION OF MARS":
                 if "INFRA" in stock.category:
-                    stock.price_fluctuation *= 1.5  # Increase fluctuation for infrastructure stocks
+                    stock.price_fluctuation *= 2.1  # Increase fluctuation for infrastructure stocks
                 elif "COMMERCE" in stock.category:
-                    stock.price_fluctuation *= 1.2  # Increase fluctuation for commerce-related stocks
+                    stock.price_fluctuation *= 1.8  # Increase fluctuation for commerce-related stocks
             elif self.event == "TECH STOCK CRASH":
                 if "TECH" in stock.category:
                     stock.price_fluctuation *= 0.7  # Decrease fluctuation for tech-related stocks
@@ -234,12 +241,12 @@ def main():
         count += 1
         print(f"TICKS TILL NEXT EVENT {tick_limit - count}")
         
-        if count % 10 == 0:
+        if count % 5 == 0:
             print("poggo")
             EventSystem.passStockData(Space_NasDaq)
         if count >= tick_limit:
             EventSystem.generate_random_event(Space_NasDaq)
             count = 0  # Reset the count after generating an event
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     main()
