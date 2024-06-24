@@ -56,6 +56,7 @@ public class JavaFXLineGraph extends Application {
         // Initially display all series on the chart
         lineChart.getData().add(seriesManager.getSeriesList().get(0));
         lineChart.getStylesheets().add(this.getClass().getResource("chart.css").toExternalForm());
+        lineChart.setAnimated(false);
 
         scrollPane = new ScrollPane();
         scrollPane.setContent(lineChart);
@@ -119,6 +120,7 @@ public class JavaFXLineGraph extends Application {
                         }
                     }
                     
+                    
                 }
 
             }
@@ -139,7 +141,6 @@ public class JavaFXLineGraph extends Application {
             System.out.print(seriesManager.getSeriesList());
 
             lineChart.getData().clear();
-            //System.out.print(seriesList.get(newIndex)); // Check Series List
             // Add the selected series back to the chart
             lineChart.getData().add(seriesManager.getSeriesList().get(newIndex));
 
