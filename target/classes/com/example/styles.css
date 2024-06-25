@@ -181,3 +181,19 @@
 }
 
 
+/*ALERT PANE*/
+.alert {
+    -fx-fill: #DC5F00; /* Text color */
+    -fx-font-weight: bold;
+    -fx-text-alignment: center;
+    -fx-font-size: 35px;
+}
+
+
+/*TIME PANE*/
+.time {
+    -fx-font-weight: bold;
+    -fx-text-alignment: center;
+    -fx-font-size: 45px;
+}
+

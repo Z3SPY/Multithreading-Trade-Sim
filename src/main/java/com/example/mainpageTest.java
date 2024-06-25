@@ -13,6 +13,7 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -116,8 +117,53 @@ public class mainpageTest extends Application {
 
         /* =============================================  */
         StackPane alertPane = new StackPane();
-        alertPane.getStyleClass().add("mainpage-cellStyle");
+
+        // Create the HBox
+        HBox hBox = new HBox();
+
+        // Create the Label
+        Label alertNewsText = new Label("INTERSTELLAR UPDATES");
+        alertNewsText.setStyle("-fx-text-fill: #DC5F00;"); // Set text color
+
+        // Create the left orange square
+        Region leftSquare = new Region();
+        leftSquare.setMinSize(10, 10);
+        leftSquare.setMaxSize(20, 20);
+        leftSquare.setTranslateX(-20);
+        leftSquare.setStyle("-fx-background-color: #DC5F00;"); // Set color to orange
+
+        // Create the right orange square
+        Region rightSquare = new Region();
+        rightSquare.setMinSize(10, 10);
+        rightSquare.setMaxSize(20, 20);
+        rightSquare.setTranslateX(20);
+        rightSquare.setStyle("-fx-background-color: #DC5F00;"); // Set color to orange
+
+        // Add the squares and the label to the HBox
+        hBox.getChildren().addAll(leftSquare, alertNewsText, rightSquare);
+
+        // Set the alignment of the HBox to center the label
+        HBox.setHgrow(leftSquare, Priority.ALWAYS);
+        HBox.setHgrow(rightSquare, Priority.ALWAYS);
+        hBox.setAlignment(Pos.CENTER);
+
+        // Add the HBox to the alertPane
+        alertPane.getChildren().add(hBox);
+
+        GridPane.setHgrow(alertPane, Priority.NEVER);
+        GridPane.setVgrow(alertPane, Priority.NEVER);
+        alertPane.setMinSize(25, 25);
+        alertPane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+
+        alertPane.getStyleClass().addAll("mainpage-cellStyle", "alert");
         midGridPane.add(alertPane, 2, 0, 1, 1);
+
+
+
+
+
+
+
 
 
         middlePane.getChildren().addAll(midGridPane);
@@ -163,13 +209,112 @@ public class mainpageTest extends Application {
 
         StackPane datePane = new StackPane();
         datePane.getStyleClass().add("mainpage-cellStyle");
+        GridPane.setHgrow(datePane, Priority.NEVER);
+        GridPane.setVgrow(datePane, Priority.NEVER);
+        datePane.setMinSize(25, 25);
+        datePane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+
+        // Create the GridPane for the layout
+        GridPane dateGrid = new GridPane();
+
+        Region topRect1 = new Region();
+        topRect1.setMinSize(50, 10);
+        topRect1.setStyle("-fx-background-color: #DC5F00;"); // Orange color
+
+        Region topRect2 = new Region();
+        topRect2.setMinSize(30, 10);
+        topRect2.setStyle("-fx-background-color: #DC5F00;"); // Orange color
+
+        VBox topSection = new VBox(5); 
+        topSection.getChildren().addAll(topRect1, topRect2);
+
+        // Create the middle section with a dark gray rectangle
+        Region middleRect = new Region();
+        middleRect.setMinSize(20, 20);
+        middleRect.setStyle("-fx-background-color: #555555;"); // Dark gray color
+
+        // Create the bottom section with two numbers
+        Label number1 = new Label("7");
+        number1.setStyle("-fx-text-fill: #FFFFFF; -fx-font-size: 20;"); // White color
+
+        Label number2 = new Label("20");
+        number2.setStyle("-fx-text-fill: #DC5F00; -fx-font-size: 20;"); // Orange color
+
+        HBox bottomSection = new HBox(10); // Horizontal box with spacing
+        bottomSection.getChildren().addAll(number1, middleRect, number2);
+        bottomSection.setAlignment(Pos.CENTER);
+
+        // Add sections to the GridPane
+        dateGrid.add(topSection, 0, 0);
+        dateGrid.add(middleRect, 0, 1);
+        dateGrid.add(bottomSection, 0, 2);
+
+        // Center the GridPane in the StackPane
+        StackPane.setAlignment(dateGrid, Pos.CENTER);
+
+        // Add the GridPane to the StackPane
+        datePane.getChildren().add(dateGrid);
+
+        // Add the datePane to the lowMidGridPane
         lowMidGridPane.add(datePane, 1, 0, 1, 1);
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+        // Create the timePane
         StackPane timePane = new StackPane();
-        timePane.getStyleClass().add("mainpage-cellStyle");
-        lowMidGridPane.add(timePane, 2, 0, 1, 1);
+        Label timeText = new Label("23:00:00");
+        timeText.setStyle("-fx-text-fill: #DC5F00;"); // Set text color
+
+        timePane.getChildren().addAll(timeText);
+        timePane.setTranslateX(10);
+
+        GridPane.setHgrow(timePane, Priority.NEVER);
+        GridPane.setVgrow(timePane, Priority.NEVER);
+        timePane.setMinSize(25, 25);
+        timePane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+
+        timePane.getStyleClass().addAll("time");
+
+        // Create the orange regiong
+        Region orangeRegion = new Region();
+        orangeRegion.setMinSize(10, 10);
+        orangeRegion.setMaxSize(55, Double.MAX_VALUE);
+        orangeRegion.setStyle("-fx-text-fill: #DC5F00; -fx-border-color: #DC5F00;"); // Set color to orange
+        orangeRegion.setTranslateX(20);
+
+        // Create an HBox to hold timePane and the orange region
+        HBox timeHBox = new HBox();
+        timeHBox.getChildren().addAll(timePane, orangeRegion);
+        timeHBox.getStyleClass().add("mainpage-cellStyle");
+
+        HBox.setHgrow(timePane, Priority.NEVER);
+        HBox.setHgrow(orangeRegion, Priority.ALWAYS);
+
+        // Add the HBox to the lowMidGridPane
+        lowMidGridPane.add(timeHBox, 2, 0, 1, 1);
 
         lowerMiddlePane.getChildren().addAll(lowMidGridPane);
+
         //LOWER MIDDLE END
 
         //#endregion
@@ -262,9 +407,9 @@ public class mainpageTest extends Application {
        
 
         RowConstraints infoGridPaneRow0 = new RowConstraints();
-        infoGridPaneRow0.setPercentHeight(28.33); 
+        infoGridPaneRow0.setPercentHeight(22); 
         RowConstraints infoGridPaneRow1 = new RowConstraints();
-        infoGridPaneRow1.setPercentHeight(28.33); 
+        infoGridPaneRow1.setPercentHeight(34.66); 
         RowConstraints infoGridPaneRow2 = new RowConstraints();
         infoGridPaneRow2.setPercentHeight(28.33); 
         RowConstraints infoGridPaneRow3 = new RowConstraints();
@@ -274,13 +419,65 @@ public class mainpageTest extends Application {
         infoGridPane.getColumnConstraints().addAll(infoGridPaneCol0);
         infoGridPane.getRowConstraints().addAll(infoGridPaneRow0, infoGridPaneRow1, infoGridPaneRow2, infoGridPaneRow3);
         
-        
+        /* CONTAINS UPDATES ARROWS UPS AND DOWNS */
         StackPane stockUpdatePane = new StackPane();
         stockUpdatePane.getStyleClass().add("mainpage-cellStyle");
-        infoGridPane.add(stockUpdatePane, 0, 0, 1, 1);
+        GridPane.setHgrow(stockUpdatePane, Priority.NEVER);
+        GridPane.setVgrow(stockUpdatePane, Priority.NEVER);
+        stockUpdatePane.setMinSize(20, 20);
+        stockUpdatePane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
+        // Create the HBox to hold the three squares
+        HBox stockHBox = new HBox(15); // Horizontal box with spacing
+        stockHBox.setMinSize(20, 20);
+        stockHBox.setMaxSize(Double.MAX_VALUE, 70);
+        stockHBox.setTranslateX(20);
+        
+        Region square1 = new Region();
+        square1.setMinSize(75, 50);
+        square1.setStyle("-fx-background-color: #1E1E1E; -fx-border-color: #DC5F00; -fx-border-width: 2;");
+
+        Region square2 = new Region();
+        square2.setMinSize(75, 50);
+        square2.setStyle("-fx-background-color: #1E1E1E; -fx-border-color: #DC5F00; -fx-border-width: 2;");
+
+        Region square3 = new Region();
+        square3.setMinSize(75, 50);
+        square3.setStyle("-fx-background-color: #1E1E1E; -fx-border-color: #DC5F00; -fx-border-width: 2;");
+
+        stockHBox.getChildren().addAll(square1, square2, square3);
+        StackPane.setAlignment(stockHBox, Pos.CENTER);
+        stockUpdatePane.getChildren().add(stockHBox);
+
+        infoGridPane.add(stockUpdatePane, 0, 0, 1, 1);
+        lowerMiddlePane.getChildren().add(infoGridPane);
+
+
+
+
+
+
+
+        /* TRADE DETAILS */
         StackPane tradeDetPane = new StackPane();
-        tradeDetPane.getStyleClass().add("mainpage-cellStyle");
+        GridPane tradeDetPaneGrid = new GridPane();
+
+        Label titleTradeDet = new Label("TRADE DETAILS");
+        titleTradeDet.setStyle("-fx-text-fill: #DC5F00; -fx-font-size: 25px;");
+
+        Label subTitleTradeDet = new Label("Trade Item: << Space Rocks >>");
+        subTitleTradeDet.setStyle("-fx-text-fill: #DC5F00; -fx-font-size: 15px;");
+
+
+
+        
+        tradeDetPaneGrid.add(titleTradeDet, 0, 0);
+        tradeDetPaneGrid.add(subTitleTradeDet, 0, 1);
+
+
+
+
+        tradeDetPane.getChildren().addAll(tradeDetPaneGrid);
         infoGridPane.add(tradeDetPane, 0, 1, 1, 1);
 
 
@@ -420,6 +617,7 @@ public class mainpageTest extends Application {
         scene.getStylesheets().add(getClass().getResource("/com/example/styles.css").toExternalForm());
         mainStage.setTitle("ISTO SYSTEM");
         mainStage.setScene(scene);
+        mainStage.setResizable(false);
         mainStage.show();
     }
 
