@@ -4,7 +4,7 @@
 
 .chart-series-line {
     -fx-stroke: black;
-    -fx-stroke-width: 3px;
+    -fx-stroke-width: 2px;
 }
 
 .chart-plot-background {
@@ -16,8 +16,9 @@
 }
 
 .chart-legend-item-symbol {
+    -fx-background-color: black, black;
     -fx-background-insets: 0, 1;
-    -fx-background-radius: 40px;
+    -fx-background-radius: 5px;
 }
 
 .chart-legend-item {

@@ -2,15 +2,16 @@ package com.example;
 
 import javafx.animation.TranslateTransition;
 import javafx.application.Application;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
-import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.BorderStroke;
 import javafx.scene.layout.BorderStrokeStyle;
@@ -18,13 +19,9 @@ import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.Border;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 
 public class login extends Application {
     @Override
@@ -51,9 +48,19 @@ public class login extends Application {
         loginButton.getStyleClass().add("login-btn"); // Apply CSS class for styling
         loginButton.setPrefWidth(265);
 
+        // Handle login button action
         loginButton.setOnAction(event -> {
-            page newPage = new page();
-            newPage.show(primaryStage);
+            String username = usernameField.getText();
+            String password = passwordField.getText();
+            MongoDBUtil mongoDBUtil = new MongoDBUtil();
+            boolean valid = mongoDBUtil.validateUser(username, password);
+            mongoDBUtil.close();
+
+            if (valid) {
+                showAlert(AlertType.INFORMATION, "Login Successful", "Welcome, " + username + "!");
+            } else {
+                showAlert(AlertType.ERROR, "Login Failed", "Invalid username or password.");
+            }
         });
 
         // Create the additional welcome message
@@ -63,9 +70,7 @@ public class login extends Application {
         additionalMessage.setWrapText(true);
         additionalMessage.setTextAlignment(TextAlignment.CENTER);
         additionalMessage.setTextFill(Color.web("#FF6600"));
-
         additionalMessage.getStyleClass().add("add-text"); // Apply CSS class for styling
-
 
         // Add components to the grid pane
         grid.add(usernameField, 0, 1, 2, 1); // Span 2 columns
@@ -73,16 +78,18 @@ public class login extends Application {
         grid.add(loginButton, 0, 3, 2, 1);   // Span 2 columns
         grid.add(additionalMessage, 0, 4, 2, 1); // Span 2 columns
 
-    
-
-       
-
         // Create the bottom register option
         HBox registerNav = new HBox();
-        Button enterButton = new Button("1. Enter");
-        Button regButton = new Button("1. Register");
+        Button enterButton = new Button("1. Enter Credentials");
+        Button regButton = new Button("2. Go To Registration");
         enterButton.getStyleClass().add("lower-btn");
         regButton.getStyleClass().add("lower-btn");
+
+        // Event listener for registration button
+        regButton.setOnAction(event -> {
+            register newPage = new register();
+            newPage.show(primaryStage);
+        });
 
         registerNav.getChildren().addAll(enterButton, regButton);
         registerNav.getStyleClass().add("bottomNav"); // Apply CSS class for styling
@@ -96,7 +103,6 @@ public class login extends Application {
         Group myGroup = new Group();
         myGroup.getChildren().addAll(grid, welcomeLabel);
 
-
         BorderPane borderPane = new BorderPane();
         borderPane.setStyle("-fx-background-color: #1E1E1E; -fx-padding: 10;"); // Increased padding
         borderPane.setCenter(myGroup);
@@ -109,8 +115,6 @@ public class login extends Application {
             new BorderWidths(2) // You can adjust the border width if needed
         )));
 
-
-        
         // Set up the scene and stage
         Scene scene = new Scene(borderPane, 750, 750);
         scene.getStylesheets().add(getClass().getResource("/com/example/styles.css").toExternalForm());
@@ -118,6 +122,13 @@ public class login extends Application {
         primaryStage.setTitle("ISTO SYSTEM");
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    private void showAlert(AlertType alertType, String title, String message) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
     public static void main(String[] args) {

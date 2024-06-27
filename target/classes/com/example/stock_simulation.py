@@ -1,3 +1,4 @@
+import json
 import time
 import numpy as np
 import random
@@ -71,19 +72,92 @@ class Player:
                         self.sell_stock(stock, self.portfolio[stock_name])
                         break
 
+
 class Events:
     def __init__(self):
         self.event = "DEFAULT"
 
     def passStockData(self, stock_list):
-        gateway = JavaGateway()
-        java_app = gateway.entry_point
+        gateway = JavaGateway()  # Connect to the Java GatewayServer
+        java_app = gateway.entry_point  # Access JavaApp instance
+
+        #java_app.getStock(stock_list)
+        data = json.dumps([vars(obj) for obj in stock_list])
+        print(data)
+        java_app.getStock(data)
+
+        
+
+        """for stock in stock_list:
+            java_app.updateStockValue(stock.stockName, stock.stockPrice)
+"""
+        gateway.close()  # Close the gateway connection
+
+    def generate_random_event(self, stock_list):
+        events = [
+            "WAR",
+            "INFLATION",
+            "TECHNOLOGICAL BREAKTHROUGH",
+            "ASTEROID MINING BOOM",
+            "SPACE TOURISM REGULATIONS",
+            "COLONIZATION OF MARS",
+            "TECH STOCK CRASH",
+            "ALIEN ENCOUNTER",
+            "SPACE WEATHER DISRUPTION",
+            "RESOURCE SCARCITY",
+            "SPACE PIRATE ATTACK",
+            "NOTHING NEW"
+        ]
+        self.event = random.choice(events)
+        self.affect_stock_prices(stock_list)
+
+    def affect_stock_prices(self, stock_list):
+        
+
+        print(f"WARNING NEW EVENT: {self.event}")
 
         for stock in stock_list:
-            if stock.stockName == "Space Rocks": 
-                java_app.updateStockValue(stock.stockName, stock.stockPrice)
+            if self.event == "WAR":
+                if "MILITARY" in stock.category:
+                    stock.price_fluctuation *= 1.5  # Increase fluctuation for military-related stocks
+            elif self.event == "INFLATION":
+                stock.price_fluctuation *= 0.5  # Decrease all price fluctuation
+            elif self.event == "TECHNOLOGICAL BREAKTHROUGH":
+                if "INFRA" in stock.category:
+                    stock.price_fluctuation *= 1.2  # Increase fluctuation for infrastructure stocks
+            elif self.event == "ASTEROID MINING BOOM":
+                if "COMMERCE" in stock.category:
+                    stock.price_fluctuation *= 1.3  # Increase fluctuation for commerce-related stocks
+            elif self.event == "SPACE TOURISM REGULATIONS":
+                if "COMMERCE" in stock.category:
+                    stock.price_fluctuation *= 0.8  # Decrease fluctuation for commerce-related stocks
+            elif self.event == "COLONIZATION OF MARS":
+                if "INFRA" in stock.category:
+                    stock.price_fluctuation *= 1.5  # Increase fluctuation for infrastructure stocks
+                elif "COMMERCE" in stock.category:
+                    stock.price_fluctuation *= 1.2  # Increase fluctuation for commerce-related stocks
+            elif self.event == "TECH STOCK CRASH":
+                if "TECH" in stock.category:
+                    stock.price_fluctuation *= 0.7  # Decrease fluctuation for tech-related stocks
+            elif self.event == "ALIEN ENCOUNTER":
+                if "MILITARY" in stock.category:
+                    stock.price_fluctuation *= 1.5  # Increase fluctuation for military-related stocks
+                elif "INFRA" in stock.category:
+                    stock.price_fluctuation *= 0.8  # Decrease fluctuation for infrastructure stocks
+            elif self.event == "SPACE WEATHER DISRUPTION":
+                if "INFRA" in stock.category:
+                    stock.price_fluctuation *= 0.9  # Decrease fluctuation for infrastructure stocks
+                elif "COMMERCE" in stock.category:
+                    stock.price_fluctuation *= 0.9  # Decrease fluctuation for commerce-related stocks
+            elif self.event == "RESOURCE SCARCITY":
+                if "COMMERCE" in stock.category:
+                    stock.price_fluctuation *= 0.8  # Decrease fluctuation for commerce-related stocks
+            elif self.event == "SPACE PIRATE ATTACK":
+                if "COMMERCE" in stock.category:
+                    stock.price_fluctuation *= 0.7  # Decrease fluctuation for commerce-related stocks
+            else:
+                stock.price_fluctuation = stock.price_fluctuation_base  # Reset to base fluctuation (0.02)
 
-        gateway.close()
 
 class Stock:
     def __init__(self, name, price, category):
@@ -98,12 +172,10 @@ class Stock:
     
     def simulate_stock_price(self, current_price):
         change_percent = np.random.normal(-self.price_fluctuation / 200, self.price_fluctuation)
-        new_price = current_price * (1 + change_percent)
-        # Ensure the price doesn't drop below a reasonable minimum
-        if new_price < 1.0:
-            new_price = 1.0 + abs(change_percent)
-        self.stockPrice = new_price
+        print(round(change_percent, 4))
+        self.stockPrice = current_price * (1 + change_percent)
         return round(self.stockPrice, 2)
+    
 
 def main():
     player = Player("John Doe", 10000)

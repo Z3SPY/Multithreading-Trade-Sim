@@ -1,3 +1,4 @@
+import json
 import time
 import numpy as np
 import random
@@ -18,6 +19,12 @@ class Player:
     
     def simulate(self, stockList):
         print(self.portfolio)
+        if len(self.portfolio) >= 1:
+            # Increase uncertainty at a random rate for each stock
+            self.increase_uncertainty()
+            # Decide whether to sell based on uncertainty level
+            self.check_uncertainty_and_sell(stockList)
+
         if len(self.portfolio) <= 3:
             choice = stockList[random.randint(0, len(stockList) - 1)]
             if self.buy_stock(choice, random.randint(1, 20)):
@@ -26,12 +33,6 @@ class Player:
             if not self.buy_stock(choice, random.randint(1, 20)):
                 print("2")
                 return
-        
-        # Increase uncertainty at a random rate for each stock
-        self.increase_uncertainty()
-
-        # Decide whether to sell based on uncertainty level
-        self.check_uncertainty_and_sell(stockList)
     
     def buy_stock(self, stock, quantity):
         total_cost = stock.stockPrice * quantity
@@ -105,6 +106,21 @@ class Events:
     def __init__(self):
         self.event = "DEFAULT"
 
+    def passStockData(self, stock_list):
+        gateway = JavaGateway()  # Connect to the Java GatewayServer
+        java_app = gateway.entry_point  # Access JavaApp instance
+
+        data = json.dumps([vars(obj) for obj in stock_list])
+        print(data)
+        java_app.updateStockValue(data)
+
+
+        #for stock in stock_list:
+        #    if (stock.stockName == "Space Rocks"):
+        #        java_app.updateStockValue(stock.stockName, stock.stockPrice)
+
+        gateway.close()  # Close the gateway connection
+
     def generate_random_event(self, stock_list):
         events = [
             "WAR",
@@ -124,8 +140,7 @@ class Events:
         self.affect_stock_prices(stock_list)
 
     def affect_stock_prices(self, stock_list):
-        gateway = JavaGateway()  # Connect to the Java GatewayServer
-        java_app = gateway.entry_point  # Access JavaApp instance
+        
 
         print(f"WARNING NEW EVENT: {self.event}")
 
@@ -146,9 +161,9 @@ class Events:
                     stock.price_fluctuation *= 0.8  # Decrease fluctuation for commerce-related stocks
             elif self.event == "COLONIZATION OF MARS":
                 if "INFRA" in stock.category:
-                    stock.price_fluctuation *= 1.5  # Increase fluctuation for infrastructure stocks
+                    stock.price_fluctuation *= 2.1  # Increase fluctuation for infrastructure stocks
                 elif "COMMERCE" in stock.category:
-                    stock.price_fluctuation *= 1.2  # Increase fluctuation for commerce-related stocks
+                    stock.price_fluctuation *= 1.8  # Increase fluctuation for commerce-related stocks
             elif self.event == "TECH STOCK CRASH":
                 if "TECH" in stock.category:
                     stock.price_fluctuation *= 0.7  # Decrease fluctuation for tech-related stocks
@@ -171,10 +186,7 @@ class Events:
             else:
                 stock.price_fluctuation = stock.price_fluctuation_base  # Reset to base fluctuation (0.02)
 
-            # Update the JavaFX UI with the new stock value
-            java_app.updateStockValue(stock.stockName, stock.stockPrice)
-
-        gateway.close()  # Close the gateway connection
+           
 
 
 class Stock:
@@ -207,7 +219,7 @@ def main():
     EventSystem = Events()
 
     count = 0
-    tick_limit = 5  # Number of ticks before generating a new event
+    tick_limit = 40  # Number of ticks before generating a new event
     Space_NasDaq = [myStock1, myStock2, myStock3, myStock4, myStock5]
 
     stop_flag = False
@@ -229,6 +241,9 @@ def main():
         count += 1
         print(f"TICKS TILL NEXT EVENT {tick_limit - count}")
         
+        if count % 5 == 0:
+            print("poggo")
+            EventSystem.passStockData(Space_NasDaq)
         if count >= tick_limit:
             EventSystem.generate_random_event(Space_NasDaq)
             count = 0  # Reset the count after generating an event

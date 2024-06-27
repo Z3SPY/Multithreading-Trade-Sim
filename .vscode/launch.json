@@ -1,0 +1,40 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "mainpageTest",
+            "request": "launch",
+            "mainClass": "com.example/com.example.mainpageTest",
+            "projectName": "istsim"
+        },
+        {
+            "type": "java",
+            "name": "login",
+            "request": "launch",
+            "mainClass": "com.example/com.example.login",
+            "projectName": "istsim"
+        },
+        {
+            "type": "java",
+            "name": "JavaFXLineGraph",
+            "request": "launch",
+            "mainClass": "com.example/com.example.JavaFXLineGraph",
+            "projectName": "istsim"
+        },
+        {
+            "type": "java",
+            "name": "Launch JavaFXLineGraph",
+            "request": "launch",
+            "mainClass": "JavaFXLineGraph",
+            "vmArgs": "--module-path C:/Java/javafx-sdk-22.0.1/lib --add-modules javafx.controls,javafx.fxml"
+        },
+        {
+            "name": "Python: Run stock_simulation",
+            "type": "python",
+            "request": "launch",
+            "program": "$C/Users/Jericho/Desktop/projectPD/src/main/java/com/example/stock_simulation.py",
+            "console": "integratedTerminal"
+        }
+    ]   
+}
