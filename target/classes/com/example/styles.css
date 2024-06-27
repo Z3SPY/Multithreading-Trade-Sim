@@ -197,3 +197,12 @@
     -fx-font-size: 45px;
 }
 
+
+.buy-sell-btn {
+    -fx-padding: 1px 25px;
+    -fx-background-color: #1E1E1E;
+    -fx-border-color: #504719;
+    -fx-border-width: 2;
+    -fx-text-fill: #504719;
+    -fx-font-size: 15px;
+}

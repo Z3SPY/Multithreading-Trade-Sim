@@ -161,7 +161,7 @@ class Events:
                     stock.price_fluctuation *= 0.8  # Decrease fluctuation for commerce-related stocks
             elif self.event == "COLONIZATION OF MARS":
                 if "INFRA" in stock.category:
-                    stock.price_fluctuation *= 2.1  # Increase fluctuation for infrastructure stocks
+                    stock.price_fluctuation *= 1.4  # Increase fluctuation for infrastructure stocks
                 elif "COMMERCE" in stock.category:
                     stock.price_fluctuation *= 1.8  # Increase fluctuation for commerce-related stocks
             elif self.event == "TECH STOCK CRASH":

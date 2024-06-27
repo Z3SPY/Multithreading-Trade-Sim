@@ -6,6 +6,7 @@ import javafx.geometry.Pos;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -21,6 +22,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import java.io.File;
+
 
 public class mainpageTest extends Application {
     
@@ -205,8 +207,9 @@ public class mainpageTest extends Application {
 
         profPane.getChildren().addAll(profileButton);
         /* =============================================  */
+        //#endregion
 
-
+        //#region Date
         StackPane datePane = new StackPane();
         datePane.getStyleClass().add("mainpage-cellStyle");
         GridPane.setHgrow(datePane, Priority.NEVER);
@@ -217,37 +220,46 @@ public class mainpageTest extends Application {
         // Create the GridPane for the layout
         GridPane dateGrid = new GridPane();
 
-        Region topRect1 = new Region();
-        topRect1.setMinSize(50, 10);
-        topRect1.setStyle("-fx-background-color: #DC5F00;"); // Orange color
 
-        Region topRect2 = new Region();
-        topRect2.setMinSize(30, 10);
-        topRect2.setStyle("-fx-background-color: #DC5F00;"); // Orange color
+        Label topRect1 = new Label("-{ Month / Day / Year }-");
+        topRect1.setStyle("-fx-text-fill: #DC5F00; -fx-font-size: 12px;"); // Orange color
+        topRect1.setTranslateY(3);
 
-        VBox topSection = new VBox(5); 
-        topSection.getChildren().addAll(topRect1, topRect2);
+
+        VBox topSection = new VBox(1); 
+        topSection.getChildren().addAll(topRect1);
+
+        // Create a Month
+        Label monthText = new Label("Apr");
+        monthText.setStyle("-fx-text-fill: #DC5F00; -fx-font-size: 20;"); // White color
+
+
+        // Create the bottom section with two numbers
+        Label dayText = new Label("7");
+        dayText.setStyle("-fx-text-fill: #FFFFFF; -fx-font-size: 20;"); // White color
 
         // Create the middle section with a dark gray rectangle
         Region middleRect = new Region();
-        middleRect.setMinSize(20, 20);
+        middleRect.setMinSize(10, 3);
+        middleRect.setMaxSize(10, 3);
         middleRect.setStyle("-fx-background-color: #555555;"); // Dark gray color
 
-        // Create the bottom section with two numbers
-        Label number1 = new Label("7");
-        number1.setStyle("-fx-text-fill: #FFFFFF; -fx-font-size: 20;"); // White color
+        Region middleRect2 = new Region();
+        middleRect2.setMinSize(10, 3);
+        middleRect2.setMaxSize(10, 3);
+        middleRect2.setStyle("-fx-background-color: #555555;"); // Dark gray color
 
-        Label number2 = new Label("20");
-        number2.setStyle("-fx-text-fill: #DC5F00; -fx-font-size: 20;"); // Orange color
+        Label yearText = new Label("4122");
+        yearText.setStyle("-fx-text-fill: #DC5F00; -fx-font-size: 20;"); // Orange color
 
-        HBox bottomSection = new HBox(10); // Horizontal box with spacing
-        bottomSection.getChildren().addAll(number1, middleRect, number2);
+        HBox bottomSection = new HBox(2); // Horizontal box with spacing
+        bottomSection.getChildren().addAll(monthText, middleRect,dayText, middleRect2, yearText);
         bottomSection.setAlignment(Pos.CENTER);
 
         // Add sections to the GridPane
+        dateGrid.setAlignment(Pos.CENTER);
         dateGrid.add(topSection, 0, 0);
-        dateGrid.add(middleRect, 0, 1);
-        dateGrid.add(bottomSection, 0, 2);
+        dateGrid.add(bottomSection, 0, 1);
 
         // Center the GridPane in the StackPane
         StackPane.setAlignment(dateGrid, Pos.CENTER);
@@ -257,30 +269,9 @@ public class mainpageTest extends Application {
 
         // Add the datePane to the lowMidGridPane
         lowMidGridPane.add(datePane, 1, 0, 1, 1);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        //#endregion
         
-
-        // Create the timePane
+        //#region TimePane
         StackPane timePane = new StackPane();
         Label timeText = new Label("23:00:00");
         timeText.setStyle("-fx-text-fill: #DC5F00;"); // Set text color
@@ -319,7 +310,6 @@ public class mainpageTest extends Application {
 
         //#endregion
 
-
         //#region Wallet Pane
         StackPane walPane = new StackPane();
         walPane.getStyleClass().addAll("mainpage-cellStyle", "wallet");
@@ -331,22 +321,33 @@ public class mainpageTest extends Application {
         titleLabel.setTextFill(Color.WHITE);
         titleLabel.setFont(Font.font("Arial", 28)); // Adjust font and size as needed
         // Create the Balance label
-        Label balanceLabel = new Label("Bal: 25.10 K SHK");
-        balanceLabel.setTranslateX(45);
-        balanceLabel.setTextFill(Color.BLACK);
+        Label balanceLabel = new Label("BALANCE: 25.10 K SHK");
+        balanceLabel.setTranslateX(25);
+        balanceLabel.setTranslateY(5);
+        balanceLabel.setTextFill(Color.WHITE);
         balanceLabel.setFont(Font.font("Arial", 20)); // Adjust font and size as needed
 
         // Create the Cp ID label
         Label cpIdLabel = new Label("Cp ID: 211934-455");
-        cpIdLabel.setTranslateX(30);
-        cpIdLabel.setTranslateY(-10);
+        cpIdLabel.setTranslateX(55);
+        cpIdLabel.setTranslateY(0);
         cpIdLabel.setTextFill(Color.BLACK);
         cpIdLabel.setFont(Font.font("Arial", 20)); // Adjust font and size as needed
+
+        Region walDivider = new Region();
+        walDivider.setMinSize(20, 5);
+        walDivider.setMaxSize(Double.MAX_VALUE, 5);
+        walDivider.setStyle("-fx-background-color: #1E1E1E;"); // Dark gray color
+
+        Region walDivider2 = new Region();
+        walDivider2.setMinSize(20, 5);
+        walDivider2.setMaxSize(Double.MAX_VALUE, 5);
+        walDivider2.setStyle("-fx-background-color: #1E1E1E;"); // Dark gray color
 
         // Create a VBox to hold the labels
         VBox vbox = new VBox(0); // Spacing between labels
         vbox.setAlignment(Pos.TOP_LEFT);
-        vbox.getChildren().addAll(titleLabel, balanceLabel, cpIdLabel);
+        vbox.getChildren().addAll(titleLabel, walDivider, balanceLabel, cpIdLabel, walDivider2);
 
         // Add the VBox to the StackPane
         walPane.getChildren().add(vbox);
@@ -362,7 +363,7 @@ public class mainpageTest extends Application {
         StackPane visPaneTop = new StackPane();
         visPaneTop.getStyleClass().add("mainpage-cellStyle-2");
 
-        Image image = new Image(new File("src\\\\main\\\\java\\\\com\\\\example\\\\space.gif").toURI().toString());
+        Image image = new Image(new File("src/main/java/com/example/space.gif").toURI().toString());
         ImageView imageView = new ImageView(image);
         
         
@@ -392,11 +393,9 @@ public class mainpageTest extends Application {
         grid.add(visPane, 0, 4, 4, 1);
         //#endregion
 
-
-
-        //#region BOTTOM RIGHT VIS PANE START
+        //#region Info Pane and Bottom Right Grid
         StackPane infoPane = new StackPane();
-        //infoPane.setStyle("-fx-background-color:BLUE");
+        infoPane.setTranslateY(-5);
         grid.add(infoPane, 4, 3, 2, 3);
 
         GridPane infoGridPane = new GridPane();
@@ -407,9 +406,9 @@ public class mainpageTest extends Application {
        
 
         RowConstraints infoGridPaneRow0 = new RowConstraints();
-        infoGridPaneRow0.setPercentHeight(22); 
+        infoGridPaneRow0.setPercentHeight(21); 
         RowConstraints infoGridPaneRow1 = new RowConstraints();
-        infoGridPaneRow1.setPercentHeight(34.66); 
+        infoGridPaneRow1.setPercentHeight(37.66); 
         RowConstraints infoGridPaneRow2 = new RowConstraints();
         infoGridPaneRow2.setPercentHeight(28.33); 
         RowConstraints infoGridPaneRow3 = new RowConstraints();
@@ -421,6 +420,7 @@ public class mainpageTest extends Application {
         
         /* CONTAINS UPDATES ARROWS UPS AND DOWNS */
         StackPane stockUpdatePane = new StackPane();
+        stockUpdatePane.setTranslateY(6);
         stockUpdatePane.getStyleClass().add("mainpage-cellStyle");
         GridPane.setHgrow(stockUpdatePane, Priority.NEVER);
         GridPane.setVgrow(stockUpdatePane, Priority.NEVER);
@@ -452,42 +452,218 @@ public class mainpageTest extends Application {
         infoGridPane.add(stockUpdatePane, 0, 0, 1, 1);
         lowerMiddlePane.getChildren().add(infoGridPane);
 
+        //#endregion
 
-
-
-
-
-
-        /* TRADE DETAILS */
+        //#region Trade Details 
         StackPane tradeDetPane = new StackPane();
         GridPane tradeDetPaneGrid = new GridPane();
+        tradeDetPaneGrid.setVgap(0);
+        tradeDetPaneGrid.setHgap(0);
+
+        ColumnConstraints tradeDetPaneGridCol0 = new ColumnConstraints();
+        tradeDetPaneGridCol0.setPercentWidth(75);
+        ColumnConstraints tradeDetPaneGridCol1 = new ColumnConstraints();
+        tradeDetPaneGridCol1.setPercentWidth(25);
+        tradeDetPaneGrid.getColumnConstraints().addAll(tradeDetPaneGridCol0,tradeDetPaneGridCol1); // each get 50% of width
+
 
         Label titleTradeDet = new Label("TRADE DETAILS");
         titleTradeDet.setStyle("-fx-text-fill: #DC5F00; -fx-font-size: 25px;");
 
-        Label subTitleTradeDet = new Label("Trade Item: << Space Rocks >>");
+        Label subTitleTradeDet = new Label("Item: << Space Rocks >>");
+        subTitleTradeDet.setTranslateY(-5);
         subTitleTradeDet.setStyle("-fx-text-fill: #DC5F00; -fx-font-size: 15px;");
 
-
-
-        
         tradeDetPaneGrid.add(titleTradeDet, 0, 0);
         tradeDetPaneGrid.add(subTitleTradeDet, 0, 1);
 
+        /* Separate Inner Grid */
+
+        GridPane tradeDetPaneInnerGrid = new GridPane();
+        tradeDetPaneInnerGrid.setHgap(0);
+        tradeDetPaneInnerGrid.setVgap(5);
 
 
+
+        ColumnConstraints trdDefPnIGCol1 = new ColumnConstraints();
+        trdDefPnIGCol1.setPercentWidth(25);
+        ColumnConstraints trdDefPnIGCol2 = new ColumnConstraints();
+        trdDefPnIGCol2.setPercentWidth(75);
+        
+        tradeDetPaneInnerGrid.getColumnConstraints().addAll(trdDefPnIGCol1, trdDefPnIGCol2); // each get 50% of width
+   
+
+        
+        StackPane ctgryStackLabel = new StackPane();
+        ctgryStackLabel.setStyle("-fx-text-fill: #DC5F00; -fx-font-size: 15px; -fx-border-width: 2; -fx-padding: 5px; -fx-border-color: #DC5F00;");
+
+        Label ctgryLabel = new Label("Ctgry");
+        ctgryLabel.setStyle("-fx-text-fill: #DC5F00; -fx-font-size: 15px; -fx-border-width: 2; -fx-padding: 5px; ");
+        ctgryStackLabel.getChildren().addAll(ctgryLabel);
+
+
+        StackPane ctgrStackLabelOutput = new StackPane();
+        ctgrStackLabelOutput.setStyle("-fx-text-fill: #DC5F00; -fx-font-size: 15px; -fx-border-width: 2; -fx-padding: 5px; -fx-border-color: #DC5F00;");
+
+        Label ctgrLabelOutput = new Label("aaa");
+        ctgrLabelOutput.setStyle("-fx-text-fill: #DC5F00; -fx-font-size: 15px; -fx-border-width: 2; -fx-padding: 5px; ");
+        ctgrStackLabelOutput.getChildren().addAll(ctgrLabelOutput);
+
+        /* */
+        StackPane priceStackLabel = new StackPane();
+        priceStackLabel.setStyle("-fx-text-fill: #DC5F00; -fx-font-size: 15px; -fx-border-width: 2; -fx-padding: 5px; -fx-border-color: #DC5F00;");
+
+        Label priceLabel = new Label("Price");
+        priceLabel.setStyle("-fx-text-fill: #DC5F00; -fx-font-size: 15px; -fx-border-width: 2; -fx-padding: 5px; ");
+        priceStackLabel.getChildren().addAll(priceLabel);
+
+        StackPane priceStackLabelOutput = new StackPane();
+        priceStackLabelOutput.setStyle("-fx-text-fill: #DC5F00; -fx-font-size: 15px; -fx-border-width: 2; -fx-padding: 5px; -fx-border-color: #DC5F00;");
+
+        Label priceLabelOutput = new Label("aaaAaaaaaa");
+        priceLabelOutput.setStyle("-fx-text-fill: #DC5F00; -fx-font-size: 15px; -fx-border-width: 2; -fx-padding: 5px; ");
+        priceStackLabelOutput.getChildren().addAll(priceLabelOutput);
+        
+
+        /* Categories and Price */
+        tradeDetPaneInnerGrid.add(ctgryStackLabel, 0, 0);
+        tradeDetPaneInnerGrid.add(ctgrStackLabelOutput, 1, 0, 1, 1);
+        tradeDetPaneInnerGrid.add(priceStackLabel, 0, 1);
+        tradeDetPaneInnerGrid.add(priceStackLabelOutput, 1, 1, 1, 1);
+
+        /* Add Inner Grid */
+        tradeDetPaneGrid.add(tradeDetPaneInnerGrid, 0, 2, 2, 1);
+        tradeDetPaneGrid.setAlignment(Pos.CENTER_LEFT);
 
         tradeDetPane.getChildren().addAll(tradeDetPaneGrid);
-        infoGridPane.add(tradeDetPane, 0, 1, 1, 1);
+
+        StackPane buyAndSellPane = new StackPane();
+        buyAndSellPane.getStyleClass().add("mainpage-cellStyle");
+
+        Button buyButton = new Button("Buy");
+        Button sellButton = new Button("Sell");
+        buyButton.getStyleClass().add("buy-sell-btn");
+        sellButton.getStyleClass().add("buy-sell-btn");
+        sellButton.setTranslateY(-5);
 
 
+        tradeDetPaneGrid.add(buyButton, 1, 0, 1, 1);
+        tradeDetPaneGrid.add(sellButton, 1, 1, 1, 1);
+
+
+        infoGridPane.add(tradeDetPane, 0, 1, 2, 1);
+
+    
+        //#endregion
+        
+        //#region  Leader Board
         StackPane topLdrPane = new StackPane();
-        topLdrPane.getStyleClass().add("mainpage-cellStyle");
-        infoGridPane.add(topLdrPane, 0, 2, 1, 1);
+        //topLdrPane.getStyleClass().add("mainpage-cellStyle");
+        
 
-        StackPane botPane = new StackPane();
-        botPane.getStyleClass().add("mainpage-cellStyle");
-        infoGridPane.add(botPane, 0, 3, 1, 1);
+        GridPane leaderGrid = new GridPane();
+
+        ColumnConstraints leaderGridcol0 = new ColumnConstraints();
+        leaderGridcol0.setPercentWidth(25);
+        ColumnConstraints leaderGridcol1 = new ColumnConstraints();
+        leaderGridcol1.setPercentWidth(75);
+
+        leaderGrid.getColumnConstraints().addAll(leaderGridcol0, leaderGridcol1);
+
+        RowConstraints leaderGridRow0 = new RowConstraints();
+        leaderGridRow0.setPercentHeight(25);
+        RowConstraints leaderGridRow1 = new RowConstraints();
+        leaderGridRow1.setPercentHeight(20);
+        RowConstraints leaderGridRow2 = new RowConstraints();
+        leaderGridRow2.setPercentHeight(20);
+        RowConstraints leaderGridRow3 = new RowConstraints();
+        leaderGridRow3.setPercentHeight(20);
+        RowConstraints leaderGridRow4 = new RowConstraints();
+        leaderGridRow4.setPercentHeight(15);
+
+        leaderGrid.getRowConstraints().addAll(leaderGridRow0, leaderGridRow1, leaderGridRow2, leaderGridRow3, leaderGridRow4);
+
+        topLdrPane.getChildren().addAll(leaderGrid);
+
+        StackPane leaderBoardTitle = new StackPane();
+        leaderBoardTitle.setStyle("-fx-border-color: #DC5F00 ; -fx-border-width: 2; -fx-padding: 1px; ");
+
+        GridPane.setHgrow(leaderBoardTitle, Priority.NEVER);
+        GridPane.setVgrow(leaderBoardTitle, Priority.NEVER);
+        leaderBoardTitle.setMinSize(25, 25);
+        leaderBoardTitle.setMaxSize(Double.MAX_VALUE, 40);
+
+        Label ldrTitle = new Label("TOP 3 EMPLOYESS BY PROFIT");
+        ldrTitle.setStyle("-fx-text-fill: #DC5F00; -fx-font-size: 25px; -fx-border-width: 2; -fx-padding: 5px; ");
+        leaderBoardTitle.getChildren().add(ldrTitle);
+
+
+        StackPane plyr1Name = new StackPane();
+        plyr1Name.setStyle("-fx-border-color: #1E1E1E; -fx-background-color:  #DC5F00; ");
+        Label p1N = new Label("JOSHUA");
+        p1N.setStyle("-fx-text-color: #1E1E1E;");
+        StackPane plyr1Status = new StackPane();
+        plyr1Status.setStyle("-fx-border-color: #DC5F00;");
+        Label p1S = new Label("Active");
+        p1S.setStyle("-fx-text-fill: #DC5F00");
+
+        plyr1Name.getChildren().addAll(p1N);
+        plyr1Status.getChildren().addAll(p1S);
+
+        StackPane plyr2Name = new StackPane();
+        plyr2Name.setStyle("-fx-border-color: #1E1E1E; -fx-background-color:  #DC5F00; ");
+        Label p2N = new Label("EMMA");
+        p2N.setStyle("-fx-text-color: #1E1E1E;");
+        StackPane plyr2Status = new StackPane();
+        plyr2Status.setStyle("-fx-border-color: #DC5F00;");
+        Label p2S = new Label("Inactive");
+        p2S.setStyle("-fx-text-fill: #DC5F00");
+
+
+        plyr2Name.getChildren().addAll(p2N);
+        plyr2Status.getChildren().addAll(p2S);
+
+        StackPane plyr3Name = new StackPane();
+        plyr3Name.setStyle("-fx-border-color: #1E1E1E; -fx-background-color:  #DC5F00; ");
+        Label p3N = new Label("LIAM");
+        p3N.setStyle("-fx-text-color: #1E1E1E;");
+        StackPane plyr3Status = new StackPane();
+        plyr3Status.setStyle("-fx-border-color: #DC5F00;");
+        Label p3S = new Label("Active");
+        p3S.setStyle("-fx-text-fill: #DC5F00");
+
+
+        plyr3Name.getChildren().addAll(p3N);
+        plyr3Status.getChildren().addAll(p3S);
+
+
+
+
+
+        leaderGrid.add(leaderBoardTitle, 0, 0, 2, 1);
+        leaderGrid.add(plyr1Name, 0, 1, 1, 1);
+        leaderGrid.add(plyr1Status, 1, 1, 1, 1);
+        leaderGrid.add(plyr2Name, 0, 2, 1, 1);
+        leaderGrid.add(plyr2Status, 1, 2, 1, 1);
+        leaderGrid.add(plyr3Name, 0, 3, 1, 1);
+        leaderGrid.add(plyr3Status, 1, 3, 1, 1);
+
+
+
+
+        infoGridPane.add(topLdrPane, 0, 2, 1, 2);
+
+
+
+        // Robot Design 
+        StackPane roboFace = new StackPane();
+        Region roboDesign = new Region();
+        roboDesign.setStyle("-fx-background-color:  #DC5F00;");
+
+        leaderGrid.add(roboFace,0, 4, 1, 1);
+        leaderGrid.add(roboDesign,1, 4, 1, 1);
+
+        
 
         infoPane.getChildren().addAll(infoGridPane);
 
@@ -496,7 +672,7 @@ public class mainpageTest extends Application {
         
 
 
-        /* BUTTON CLICK INTERACTIONS */
+        //#region BUTTON CLICK INTERACTIONS
         // Event handling to toggle button selection
         marketButton.setOnAction(event -> {
             marketButton.getStyleClass().clear(); // Clear existing styles
@@ -535,7 +711,7 @@ public class mainpageTest extends Application {
         homeContent.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE); // Allow StackPane to grow
 
 
-        Image bHoleImage = new Image(new File("src\\main\\java\\com\\example\\bhole.gif").toURI().toString());
+        Image bHoleImage = new Image(new File("src/main/java/com/example/bhole.gif").toURI().toString());
         ImageView bHoleImageView = new ImageView(bHoleImage);
         
 
@@ -608,8 +784,7 @@ public class mainpageTest extends Application {
             homeButton.getStyleClass().add("button");
 
         });
-
-        /* BUTTON CLICK INTERACTIONS */
+        //#endregion
         
 
         Scene scene = new Scene(grid, 900, 750);
