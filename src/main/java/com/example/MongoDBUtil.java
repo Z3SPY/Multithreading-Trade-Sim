@@ -7,6 +7,9 @@ import com.mongodb.client.MongoCollection;
 import org.bson.Document;
 import com.mongodb.client.model.Filters;
 
+import javafx.scene.chart.PieChart.Data;
+
+import java.util.ArrayList; 
 import java.util.Random;
 
 public class MongoDBUtil {
@@ -25,9 +28,14 @@ public class MongoDBUtil {
         collection = database.getCollection(COLLECTION_NAME);
     }
 
-    public boolean validateUser(String username, String password) {
+    @SuppressWarnings("exports")
+    public Document validateUser(String username, String password) {
         Document user = collection.find(Filters.eq("username", username)).first();
-        return user != null && user.getString("password").equals(password);
+        if (user != null && user.getString("password").equals(password)) {
+            return user;
+        } else {
+            return null;
+        }
     }
 
     public boolean addUser(String username, String password, String companyId) {
@@ -39,7 +47,7 @@ public class MongoDBUtil {
                 .append("username", username)
                 .append("password", password)
                 .append("companyId", companyId)
-                .append("Stocks", companyId);
+                .append("stock", new ArrayList<DataObject>());
         collection.insertOne(newUser);
         return true;
     }
@@ -52,6 +60,12 @@ public class MongoDBUtil {
     public boolean isCompanyIdExists(String companyId) {
         Document company = collection.find(Filters.eq("companyId", companyId)).first();
         return company != null;
+    }
+
+    public void updateStock(ArrayList<DataObject> list, String username) {
+        Document filter = new Document("username", username);
+        Document update = new Document("$set", new Document("stock", list));
+        collection.updateOne(filter, update);
     }
 
     private int generateUniqueRandomId() {

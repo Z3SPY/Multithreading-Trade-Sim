@@ -1,0 +1,70 @@
+.my-text {
+    -fx-font-file: url('/target/classes/com/example/fonts/Post No Bills Colombo.ttf'); /* Specify the path to your font file */
+    -fx-font-family: "Post No Bills Colombo";
+    -fx-font-size: 30px;
+    -fx-fill: #1E1E1E; /* Text color */
+    -fx-font-weight: bold;
+    -fx-text-alignment: center;
+    -fx-background-color: #DC5F00; 
+    -fx-padding: 0 50px;
+}
+
+.reglbl-text {
+    -fx-font-size: 25px;
+    -fx-text-fill: #DC5F00; /* Text color */
+    -fx-font-weight: bold;
+    -fx-text-alignment: center;
+    -fx-padding: 0 25px;
+}
+
+
+.userField, .passField {
+    -fx-padding: 5px 5px;
+    -fx-font-family: "Post No Bills Colombo";
+    -fx-font-size: 20px;
+    -fx-background-color: transparent;
+    -fx-border-color: #DC5F00; 
+    -fx-text-fill: #DC5F00;
+}
+
+.add-text {
+    -fx-padding: 5px 5px;
+    -fx-font-family: "Post No Bills Colombo";
+    -fx-font-size: 16px;
+    -fx-text-fill: #DC5F00;
+}
+
+.login-btn, .register-btn {
+    -fx-font-family: "Post No Bills Colombo";
+    -fx-background-color: #DC5F00; 
+    -fx-text-fill: #1E1E1E; 
+    -fx-font-weight: bold;
+    -fx-font-size: 19px;
+
+}
+
+.login-btn:hover, .register-btn:hover {
+    -fx-background-color: #ffffff;
+}
+
+.lower-btn {
+   -fx-fill: #1E1E1E; /* Text color */
+   -fx-text-fill: #DC5F00;
+   -fx-font-family: "Post No Bills Colombo";
+   -fx-background-color: #1E1E1E;
+   -fx-font-size: 20px;
+}
+
+.lower-btn:hover {
+    -fx-background-color: #363434f0;
+
+}
+
+.bottomNav {
+    -fx-padding: 5;
+    -fx-border-color: #DC5F00;
+    -fx-border-insets: 5;
+    -fx-border-width: 3;
+    -fx-border-style: solid;
+
+}

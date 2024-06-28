@@ -23,8 +23,17 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import java.io.File;
 
+import java.util.HashMap;
+import java.util.Map;
 
 public class mainpageTest extends Application {
+
+    public Map<String, Object> curAccount;
+    public mainpageTest(Profile profileInstance) {
+        this.curAccount = profileInstance.getProfileData();
+        System.out.println(this.curAccount.get("name"));
+
+    }
     
     @Override
     public void start(Stage mainStage) {
@@ -231,12 +240,12 @@ public class mainpageTest extends Application {
 
         // Create a Month
         Label monthText = new Label("Apr");
-        monthText.setStyle("-fx-text-fill: #DC5F00; -fx-font-size: 20;"); // White color
+        monthText.setStyle("-fx-text-fill: #DC5F00; -fx-font-size: 20;");
 
 
         // Create the bottom section with two numbers
         Label dayText = new Label("7");
-        dayText.setStyle("-fx-text-fill: #FFFFFF; -fx-font-size: 20;"); // White color
+        dayText.setStyle("-fx-text-fill: #FFFFFF; -fx-font-size: 20;"); 
 
         // Create the middle section with a dark gray rectangle
         Region middleRect = new Region();
@@ -290,7 +299,7 @@ public class mainpageTest extends Application {
         Region orangeRegion = new Region();
         orangeRegion.setMinSize(10, 10);
         orangeRegion.setMaxSize(55, Double.MAX_VALUE);
-        orangeRegion.setStyle("-fx-text-fill: #DC5F00; -fx-border-color: #DC5F00;"); // Set color to orange
+        orangeRegion.setStyle("-fx-text-fill: #DC5F00; -fx-background-color: #DC5F00;"); // Set color to orange
         orangeRegion.setTranslateX(20);
 
         // Create an HBox to hold timePane and the orange region
@@ -351,10 +360,11 @@ public class mainpageTest extends Application {
 
         // Add the VBox to the StackPane
         walPane.getChildren().add(vbox);
+        walPane.setTranslateY(-5);
 
         GridPane.setHgrow(walPane, Priority.ALWAYS);
         GridPane.setVgrow(walPane, Priority.ALWAYS);
-        walPane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        walPane.setMaxSize(Double.MAX_VALUE, 50);
 
         grid.add(walPane, 0, 1, 2, 1);
         //#endregion
@@ -468,11 +478,11 @@ public class mainpageTest extends Application {
 
 
         Label titleTradeDet = new Label("TRADE DETAILS");
-        titleTradeDet.setStyle("-fx-text-fill: #DC5F00; -fx-font-size: 25px;");
+        titleTradeDet.setStyle("-fx-text-fill: #FFFFFF; -fx-font-size: 25px;");
 
         Label subTitleTradeDet = new Label("Item: << Space Rocks >>");
         subTitleTradeDet.setTranslateY(-5);
-        subTitleTradeDet.setStyle("-fx-text-fill: #DC5F00; -fx-font-size: 15px;");
+        subTitleTradeDet.setStyle("-fx-text-fill: #FFFFFF; -fx-font-size: 15px;");
 
         tradeDetPaneGrid.add(titleTradeDet, 0, 0);
         tradeDetPaneGrid.add(subTitleTradeDet, 0, 1);
@@ -495,33 +505,33 @@ public class mainpageTest extends Application {
 
         
         StackPane ctgryStackLabel = new StackPane();
-        ctgryStackLabel.setStyle("-fx-text-fill: #DC5F00; -fx-font-size: 15px; -fx-border-width: 2; -fx-padding: 5px; -fx-border-color: #DC5F00;");
+        ctgryStackLabel.setStyle("-fx-text-fill: #FFFFFF; -fx-font-size: 15px; -fx-border-width: 2; -fx-padding: 5px; -fx-border-color: #DC5F00;");
 
         Label ctgryLabel = new Label("Ctgry");
-        ctgryLabel.setStyle("-fx-text-fill: #DC5F00; -fx-font-size: 15px; -fx-border-width: 2; -fx-padding: 5px; ");
+        ctgryLabel.setStyle("-fx-text-fill: #FFFFFF; -fx-font-size: 15px; -fx-border-width: 2; -fx-padding: 5px; ");
         ctgryStackLabel.getChildren().addAll(ctgryLabel);
 
 
         StackPane ctgrStackLabelOutput = new StackPane();
-        ctgrStackLabelOutput.setStyle("-fx-text-fill: #DC5F00; -fx-font-size: 15px; -fx-border-width: 2; -fx-padding: 5px; -fx-border-color: #DC5F00;");
+        ctgrStackLabelOutput.setStyle("-fx-text-fill: #FFFFFF; -fx-font-size: 15px; -fx-border-width: 2; -fx-padding: 5px; -fx-border-color: #DC5F00;");
 
         Label ctgrLabelOutput = new Label("aaa");
-        ctgrLabelOutput.setStyle("-fx-text-fill: #DC5F00; -fx-font-size: 15px; -fx-border-width: 2; -fx-padding: 5px; ");
+        ctgrLabelOutput.setStyle("-fx-text-fill: #FFFFFF; -fx-font-size: 15px; -fx-border-width: 2; -fx-padding: 5px; ");
         ctgrStackLabelOutput.getChildren().addAll(ctgrLabelOutput);
 
         /* */
         StackPane priceStackLabel = new StackPane();
-        priceStackLabel.setStyle("-fx-text-fill: #DC5F00; -fx-font-size: 15px; -fx-border-width: 2; -fx-padding: 5px; -fx-border-color: #DC5F00;");
+        priceStackLabel.setStyle("-fx-text-fill: #FFFFFF; -fx-font-size: 15px; -fx-border-width: 2; -fx-padding: 5px; -fx-border-color: #DC5F00;");
 
         Label priceLabel = new Label("Price");
-        priceLabel.setStyle("-fx-text-fill: #DC5F00; -fx-font-size: 15px; -fx-border-width: 2; -fx-padding: 5px; ");
+        priceLabel.setStyle("-fx-text-fill: #FFFFFF; -fx-font-size: 15px; -fx-border-width: 2; -fx-padding: 5px; ");
         priceStackLabel.getChildren().addAll(priceLabel);
 
         StackPane priceStackLabelOutput = new StackPane();
-        priceStackLabelOutput.setStyle("-fx-text-fill: #DC5F00; -fx-font-size: 15px; -fx-border-width: 2; -fx-padding: 5px; -fx-border-color: #DC5F00;");
+        priceStackLabelOutput.setStyle("-fx-text-fill: #FFFFFF; -fx-font-size: 15px; -fx-border-width: 2; -fx-padding: 5px; -fx-border-color: #DC5F00;");
 
         Label priceLabelOutput = new Label("aaaAaaaaaa");
-        priceLabelOutput.setStyle("-fx-text-fill: #DC5F00; -fx-font-size: 15px; -fx-border-width: 2; -fx-padding: 5px; ");
+        priceLabelOutput.setStyle("-fx-text-fill: #FFFFFF; -fx-font-size: 15px; -fx-border-width: 2; -fx-padding: 5px; ");
         priceStackLabelOutput.getChildren().addAll(priceLabelOutput);
         
 
@@ -765,9 +775,77 @@ public class mainpageTest extends Application {
 
 
             // Create colored content for profileButton
-            StackPane profileContent = new StackPane();
-            profileContent.setStyle("-fx-background-color: #27AE60;"); // Set background color
-            // You can add more nodes or content to profileContent if needed
+           StackPane profileContent = new StackPane();
+            profileContent.setStyle("-fx-background-color: #1E1E1E;"); // Set background color
+            
+
+            GridPane profileContentGrid = new GridPane();
+            profileContentGrid.setVgap(5);
+
+            ColumnConstraints profileContentGridCol0 = new ColumnConstraints();
+            profileContentGridCol0.setPercentWidth(50);
+            ColumnConstraints profileContentGridCol1 = new ColumnConstraints();
+            profileContentGridCol1.setPercentWidth(50);
+
+            profileContentGrid.getColumnConstraints().addAll(profileContentGridCol0, profileContentGridCol1);
+
+            RowConstraints profileContentGridRow0 = new RowConstraints();
+            profileContentGridRow0.setPercentHeight(50);
+            RowConstraints profileContentGridRow1 = new RowConstraints();
+            profileContentGridRow1.setPercentHeight(50);
+
+            profileContentGrid.getRowConstraints().addAll(profileContentGridRow0, profileContentGridRow1);
+
+            
+            ImageView profilePicture = new ImageView();
+            profilePicture.setFitWidth(150);
+            profilePicture.setFitHeight(150);
+            profilePicture.setImage(new Image(new File("src/main/java/com/example/profile_picture.png").toURI().toString()));
+
+
+
+            StackPane profStackPane = new StackPane(); 
+            profStackPane.getChildren().add(profilePicture);
+            // profStackPane.setStyle("-fx-background-color: #ffffff;");
+
+
+            // Username
+            Label usernameLabel = new Label((String)this.curAccount.get("name"));
+            usernameLabel.setStyle("-fx-text-fill: #FFFFFF; -fx-font-size: 24;"); // White text, size 24
+
+            // Company ID
+            Label companyIdLabel = new Label("Company ID: " + (String)this.curAccount.get("companyID"));
+            companyIdLabel.setStyle("-fx-text-fill: #FFFFFF; -fx-font-size: 18;"); // White text, size 18
+            companyIdLabel.setTranslateY(20);
+
+
+            StackPane profDetStackPane = new StackPane();
+            profDetStackPane.getChildren().addAll(companyIdLabel,usernameLabel);
+
+            // profDetStackPane.setStyle("-fx-background-color: yellow;");
+
+            StackPane profListStackPane = new StackPane();
+            // profListStackPane.setStyle("-fx-background-color: green;");
+
+
+            profileContentGrid.add(profStackPane, 0, 0);
+            profileContentGrid.add(profDetStackPane, 1, 0);
+            profileContentGrid.add(profListStackPane, 0, 1, 2, 1);
+
+
+            profileContent.getChildren().add(profileContentGrid);
+            
+
+            // VBox profileBox = new VBox(10); // Spacing between nodes
+            // profileBox.setAlignment(Pos.CENTER);
+
+            
+            
+            // // Add nodes to the VBox
+            // profileBox.getChildren().addAll(profilePicture, usernameLabel, companyIdLabel);
+
+            // // Add the VBox to the profileContent StackPane
+            // profileContent.getChildren().add(profileBox);
 
             // Add content to visPane
             visPane.getChildren().add(profileContent);
@@ -784,6 +862,7 @@ public class mainpageTest extends Application {
             homeButton.getStyleClass().add("button");
 
         });
+
         //#endregion
         
 

@@ -1,6 +1,7 @@
 package com.example;
 
-import javafx.animation.TranslateTransition;
+import org.bson.Document;
+
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
@@ -53,14 +54,30 @@ public class login extends Application {
             String username = usernameField.getText();
             String password = passwordField.getText();
             MongoDBUtil mongoDBUtil = new MongoDBUtil();
-            boolean valid = mongoDBUtil.validateUser(username, password);
-            mongoDBUtil.close();
+          
 
-            if (valid) {
+            Document user = mongoDBUtil.validateUser(username, password);
+            if (user!= null) {
+                Profile profileInstance = new Profile(user.getString("username"), user.getString("companyId"));
+                
                 showAlert(AlertType.INFORMATION, "Login Successful", "Welcome, " + username + "!");
+                System.out.println("login success");
+                
+                System.out.print(profileInstance.getProfileData());
+
+                String companyId = user.getString("companyId");
+                
+                System.out.println("login success");
+                System.out.println("user: "+companyId+" has logged in");
+                mainpageTest mainPage = new mainpageTest(profileInstance);
+                mainPage.start(primaryStage);
             } else {
+                System.out.println("Invalid username or password");
                 showAlert(AlertType.ERROR, "Login Failed", "Invalid username or password.");
+
             }
+
+            mongoDBUtil.close();
         });
 
         // Create the additional welcome message
@@ -117,7 +134,7 @@ public class login extends Application {
 
         // Set up the scene and stage
         Scene scene = new Scene(borderPane, 750, 750);
-        scene.getStylesheets().add(getClass().getResource("/com/example/styles.css").toExternalForm());
+        scene.getStylesheets().add(getClass().getResource("/com/example/authstyles.css").toExternalForm());
         scene.setFill(Color.web("1E1E1E", 1.0));
         primaryStage.setTitle("ISTO SYSTEM");
         primaryStage.setScene(scene);

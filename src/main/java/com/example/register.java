@@ -130,7 +130,7 @@ public class register {
         )));
 
         Scene scene = new Scene(borderPane, 750, 750);
-        scene.getStylesheets().add(getClass().getResource("/com/example/styles.css").toExternalForm());
+        scene.getStylesheets().add(getClass().getResource("/com/example/authstyles.css").toExternalForm());
         scene.setFill(Color.web("1E1E1E", 1.0));
         stage.setTitle("ISTO SYSTEM");
         stage.setScene(scene);
