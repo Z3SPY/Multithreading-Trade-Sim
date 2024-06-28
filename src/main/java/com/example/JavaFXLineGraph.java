@@ -15,8 +15,12 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
+import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import py4j.GatewayServer;
@@ -39,6 +43,27 @@ public class JavaFXLineGraph extends Application {
 
     @Override
     public void start(Stage stage) {
+
+        /* DEFINED GRID VIEW  */
+
+        GridPane stockGridPane = new GridPane();
+
+        RowConstraints row0 = new RowConstraints();
+        row0.setPercentHeight(30);
+        RowConstraints row1 = new RowConstraints();
+        row1.setPercentHeight(70);
+
+        ColumnConstraints col0 = new ColumnConstraints();
+        col0.setPercentWidth(100);
+
+        stockGridPane.getColumnConstraints().add(col0);
+        stockGridPane.getRowConstraints().addAll(row0, row1);
+
+        /* DEFINED GRID VIEW  */
+
+
+        /* DEFINE LINE CHART LAYOUTS */
+
         xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
         xAxis.setLabel("Time");
@@ -47,6 +72,7 @@ public class JavaFXLineGraph extends Application {
         lineChart.setTitle("Stock Monitoring");
 
         // Initialize series names and add them to seriesList
+        // Make this adapt to given python
         seriesManager.getSeriesList().add(createSeries("Space Rocks"));
         seriesManager.getSeriesList().add(createSeries("Hyper Accelerators"));
         seriesManager.getSeriesList().add(createSeries("Tiki Torches"));
@@ -55,7 +81,7 @@ public class JavaFXLineGraph extends Application {
 
         // Initially display all series on the chart
         lineChart.getData().add(seriesManager.getSeriesList().get(0));
-        lineChart.getStylesheets().add(this.getClass().getResource("chart.css").toExternalForm());
+        
         lineChart.setAnimated(false);
 
         scrollPane = new ScrollPane();
@@ -64,27 +90,36 @@ public class JavaFXLineGraph extends Application {
         scrollPane.setFitToWidth(true);
         scrollPane.setFitToHeight(true);
 
+        /* DEFINE LINE CHART LAYOUTS */
+
         // Add buttons for switching stocks
-        List<Button> stockButtons = new ArrayList<>();
+        
+
+        ListView<String> stockListView = new ListView<>();
         for (int i = 0; i < seriesManager.getSeriesList().size(); i++) {
-            Button stockButton = new Button(seriesManager.getSeriesList().get(i).getName());
-            int index = i; // To capture in lambda
-            stockButton.setOnAction(e -> switchStock(index));
-            stockButtons.add(stockButton);
+            String stockName = seriesManager.getSeriesList().get(i).getName();
+            stockListView.getItems().add(stockName);
         }
 
-        HBox buttonBox = new HBox(10);
-        buttonBox.getChildren().addAll(stockButtons);
+        stockListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            int selectedIndex = stockListView.getSelectionModel().getSelectedIndex();
+            if (selectedIndex >= 0) {
+                switchStock(selectedIndex);
+            }
+        });
 
-        VBox root = new VBox(scrollPane, buttonBox);
-        Scene scene = new Scene(root, 800.0, 600.0);
+        stockGridPane.add(stockListView, 0, 0);
+        stockGridPane.add(scrollPane, 0, 1);
+
+        Scene scene = new Scene(stockGridPane, 800.0, 600.0);
+        scene.getStylesheets().add(this.getClass().getResource("chart.css").toExternalForm());
         stage.setTitle("Stock Price Line Chart");
         stage.setScene(scene);
         stage.show();
     }
 
     public void updateStockValue(String jsonData) {
-        Platform.runLater(() -> {
+        Platform.runLater(() -> {   
 
             // Ensure seriesList is not null
             List<XYChart.Series<Number, Number>> seriesList = seriesManager.getSeriesList();
@@ -94,9 +129,6 @@ public class JavaFXLineGraph extends Application {
             Gson gson = new Gson();
             List<DataObject> data = gson.fromJson(jsonData, new TypeToken<List<DataObject>>(){}.getType());
             
-        
-            
-
 
             // Update the corresponding series with new data
             timeCounter++;
@@ -143,10 +175,6 @@ public class JavaFXLineGraph extends Application {
             lineChart.getData().clear();
             // Add the selected series back to the chart
             lineChart.getData().add(seriesManager.getSeriesList().get(newIndex));
-
-
-
-            
 
             ObservableList<XYChart.Data<Number, Number>> data = seriesManager.getSeriesList().get(newIndex).getData();
 

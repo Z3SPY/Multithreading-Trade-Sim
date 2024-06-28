@@ -209,19 +209,36 @@ class Stock:
         return round(self.stockPrice, 2)
 
 def main():
-    player = Player("John Doe", 10000)
-    myStock1 = Stock("Space Rocks", 100, "INFRA")
-    myStock2 = Stock("Hyper Accelerators", 90, "MILITARY")
-    myStock3 = Stock("Tiki Torches", 120, "COMMERCE")
-    myStock4 = Stock("Space Worm Jelly", 2000, "COMMERCE")
-    myStock5 = Stock("Stone Pick Axe", 10, "INFRA")
     
+
+    player = Player("John Doe", 10000)
     EventSystem = Events()
 
     count = 0
     tick_limit = 40  # Number of ticks before generating a new event
-    Space_NasDaq = [myStock1, myStock2, myStock3, myStock4, myStock5]
-
+    Space_NasDaq = [
+        Stock("Space Rocks", 100, "INFRA"),
+        Stock("Hyper Accelerators", 90, "MILITARY"),
+        Stock("Tiki Torches", 120, "COMMERCE"),
+        Stock("Space Worm Jelly", 2000, "COMMERCE"),
+        Stock("Stone Pick Axe", 10, "INFRA"),
+        Stock("Quantum Crystals", 150, "TECH"),
+        Stock("Galactic Spices", 300, "COMMERCE"),
+        Stock("Nebula Diamonds", 5000, "LUXURY"),
+        Stock("Warp Engines", 800, "TECH"),
+        Stock("Starship Blueprints", 50, "TECH"),
+        Stock("Plasma Cannons", 180, "MILITARY"),
+        Stock("Dimensional Artifacts", 250, "CURIOSITIES"),
+        Stock("Cosmic Energy Cells", 400, "ENERGY"),
+        Stock("Alien Relics", 700, "CURIOSITIES"),
+        Stock("Neutronium Ore", 1200, "MATERIALS"),
+        Stock("Holographic Entertainment", 80, "CULTURE"),
+        Stock("Teleportation Devices", 350, "TECH"),
+        Stock("Asteroid Mining Rights", 2000, "MATERIALS"),
+        Stock("Exotic Pets", 180, "CURIOSITIES"),
+        Stock("Void Crystals", 280, "ENERGY")
+    ]
+    
     stop_flag = False
     
     while not stop_flag:

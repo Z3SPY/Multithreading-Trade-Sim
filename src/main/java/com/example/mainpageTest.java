@@ -711,19 +711,19 @@ public class mainpageTest extends Application {
         homeContent.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE); // Allow StackPane to grow
 
 
-        Image bHoleImage = new Image(new File("src/main/java/com/example/bhole.gif").toURI().toString());
-        ImageView bHoleImageView = new ImageView(bHoleImage);
+        Image blackHoleImage = new Image(new File("src/main/java/com/example/blackhole.gif").toURI().toString());
+        ImageView blackHoleImageView = new ImageView(blackHoleImage);
         
 
         imgContent.setMinSize(100, 100); // Adjust as needed
         imgContent.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE); // Allow StackPane to grow
 
-        bHoleImageView.fitWidthProperty().bind(homeContent.widthProperty());
-        bHoleImageView.fitHeightProperty().bind(homeContent.heightProperty());
-        bHoleImageView.setPreserveRatio(false); // Maintain aspect ratio
+        blackHoleImageView.fitWidthProperty().bind(homeContent.widthProperty());
+        blackHoleImageView.fitHeightProperty().bind(homeContent.heightProperty());
+        blackHoleImageView.setPreserveRatio(false); // Maintain aspect ratio
         
 
-        homeContent.getChildren().addAll(bHoleImageView, planet);
+        homeContent.getChildren().addAll(blackHoleImageView, planet);
         visPane.getChildren().add(homeContent);
 
 
@@ -743,7 +743,7 @@ public class mainpageTest extends Application {
             homeContentReset.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE); // Allow StackPane to grow
 
             // Add content to visPane
-            homeContentReset.getChildren().addAll(bHoleImageView, planet);
+            homeContentReset.getChildren().addAll(blackHoleImageView, planet);
             visPane.getChildren().add(homeContentReset);
 
 
