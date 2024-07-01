@@ -1,18 +1,18 @@
 .chart {
-    -fx-background-color: orange;
+    -fx-background-color: #1E1E1E;
 }
 
 .chart-series-line {
-    -fx-stroke: black;
+    -fx-stroke: #1E1E1E;
     -fx-stroke-width: 3px;
 }
 
 .chart-plot-background {
-    -fx-background-color: orange;
+    -fx-background-color: #1E1E1E;
 }
 
 .chart-legend {
-    -fx-background-color: orange;
+    -fx-background-color: #1E1E1E;
 }
 
 .chart-legend-item-symbol {
@@ -21,22 +21,89 @@
 }
 
 .chart-legend-item {
-    -fx-text-fill: black;
+    -fx-text-fill: #DC5F00;
 }
 
 .chart-plot-background {
+    -fx-stroke: #DC5F00;
+    -fx-stroke-width: 10px;
     -fx-padding: 0;
     -fx-border-insets: 0;
     -fx-background-insets: 0;
 }
 
 .chart-content {
+    -fx-stroke: #DC5F00;
     -fx-padding: 0;
     -fx-border-insets: 0;
     -fx-background-insets: 0;
 }
 
 .chart-line-symbol {
+    -fx-stroke: #DC5F00;
     -fx-background-color: null;
 }
 
+.x-axis, .y-axis {
+    -fx-stroke: #DC5F00;
+    -fx-font-weight: bold;
+
+}
+
+.axis-tick-label, .axis-tick-mark, .axis-label {
+    -fx-stroke: #DC5F00;
+    -fx-font-weight: bold;
+}
+
+.chart-series-line {
+}
+
+/* List Cell Css*/ 
+
+.list-view {
+    -fx-padding: 10px;
+    -fx-background-color: #1E1E1E;
+}
+.list-cell {
+    -fx-background-color: #1E1E1E;
+    -fx-text-fill: white;
+    -fx-padding: 10px;
+
+}
+.list-cell:filled {
+    -fx-background-color: #1E1E1E;
+    -fx-border-radius: 100%;
+
+}
+.list-cell:filled:selected {
+    -fx-background-color: #DC5F00;
+    -fx-border-radius: 100%;
+    
+
+
+}
+.list-cell:filled:hover {
+    -fx-background-color: #ffffffb9;
+    -fx-border-radius: 100%;
+
+}
+.list-view .scroll-bar {
+    -fx-background-color: #1E1E1E;
+
+}
+.list-view .scroll-bar .thumb {
+    -fx-background-color: #DC5F00;
+    -fx-text-fill: #DC5F00;
+    
+
+}
+.list-view .scroll-bar .track {
+    -fx-background-color: #1E1E1E;
+
+}
+.list-view .scroll-bar .increment-button {
+
+}
+.list-view .scroll-bar .decrement-button {
+    
+}

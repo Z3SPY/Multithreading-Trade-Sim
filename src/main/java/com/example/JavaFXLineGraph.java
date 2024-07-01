@@ -8,6 +8,8 @@ import com.google.gson.reflect.TypeToken;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -19,9 +21,8 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.RowConstraints;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import py4j.GatewayServer;
 
@@ -36,16 +37,21 @@ public class JavaFXLineGraph extends Application {
     private LineChart<Number, Number> lineChart;
 
     public static void main(String[] args) {
-        GatewayServer server = new GatewayServer(new JavaFXLineGraph());
-        server.start();
         launch(args);
     }
 
     @Override
     public void start(Stage stage) {
+        StackPane root = createStackPane();
+        Scene scene = new Scene(root, 800.0, 600.0);
+        scene.getStylesheets().add(this.getClass().getResource("chart.css").toExternalForm());
+        stage.setTitle("Stock Price Line Chart");
+        stage.setScene(scene);
+        stage.show();
+    }
 
+    public StackPane createStackPane() {
         /* DEFINED GRID VIEW  */
-
         GridPane stockGridPane = new GridPane();
 
         RowConstraints row0 = new RowConstraints();
@@ -61,7 +67,6 @@ public class JavaFXLineGraph extends Application {
 
         /* DEFINED GRID VIEW  */
 
-
         /* DEFINE LINE CHART LAYOUTS */
 
         xAxis = new NumberAxis();
@@ -69,19 +74,19 @@ public class JavaFXLineGraph extends Application {
         xAxis.setLabel("Time");
         yAxis.setLabel("Stock Price");
         lineChart = new LineChart<>(xAxis, yAxis);
-        lineChart.setTitle("Stock Monitoring");
+        //lineChart.setTitle("Stock Monitoring");
 
         // Initialize series names and add them to seriesList
         // Make this adapt to given python
-        seriesManager.getSeriesList().add(createSeries("Space Rocks"));
-        seriesManager.getSeriesList().add(createSeries("Hyper Accelerators"));
-        seriesManager.getSeriesList().add(createSeries("Tiki Torches"));
-        seriesManager.getSeriesList().add(createSeries("Space Worm Jelly"));
-        seriesManager.getSeriesList().add(createSeries("Stone Pick Axe"));
+        seriesManager.getSeriesList().add(createSeries("Space Rocks(SR) // INFRASTRUCUTURE"));
+        seriesManager.getSeriesList().add(createSeries("Hyper Accelerators(HA) // MILITARY"));
+        seriesManager.getSeriesList().add(createSeries("Tiki Torches(TkT) // COMMERCE"));
+        seriesManager.getSeriesList().add(createSeries("Space Worm Jelly(SWJ) // COMMERCE"));
+        seriesManager.getSeriesList().add(createSeries("Stone Pick Axe(SPA) // INFRASTRUCUTURE"));
 
         // Initially display all series on the chart
         lineChart.getData().add(seriesManager.getSeriesList().get(0));
-        
+
         lineChart.setAnimated(false);
 
         scrollPane = new ScrollPane();
@@ -93,7 +98,6 @@ public class JavaFXLineGraph extends Application {
         /* DEFINE LINE CHART LAYOUTS */
 
         // Add buttons for switching stocks
-        
 
         ListView<String> stockListView = new ListView<>();
         for (int i = 0; i < seriesManager.getSeriesList().size(); i++) {
@@ -111,16 +115,14 @@ public class JavaFXLineGraph extends Application {
         stockGridPane.add(stockListView, 0, 0);
         stockGridPane.add(scrollPane, 0, 1);
 
-        Scene scene = new Scene(stockGridPane, 800.0, 600.0);
-        scene.getStylesheets().add(this.getClass().getResource("chart.css").toExternalForm());
-        stage.setTitle("Stock Price Line Chart");
-        stage.setScene(scene);
-        stage.show();
+        StackPane stackPane = new StackPane();
+        stackPane.getChildren().add(stockGridPane);
+
+        return stackPane;
     }
 
     public void updateStockValue(String jsonData) {
-        Platform.runLater(() -> {   
-
+        Platform.runLater(() -> {
             // Ensure seriesList is not null
             List<XYChart.Series<Number, Number>> seriesList = seriesManager.getSeriesList();
 
@@ -128,7 +130,6 @@ public class JavaFXLineGraph extends Application {
 
             Gson gson = new Gson();
             List<DataObject> data = gson.fromJson(jsonData, new TypeToken<List<DataObject>>(){}.getType());
-            
 
             // Update the corresponding series with new data
             timeCounter++;
@@ -136,11 +137,10 @@ public class JavaFXLineGraph extends Application {
                 double stockPrice = data.get(i).getStockPrice();
                 XYChart.Series<Number, Number> series = seriesList.get(i);
                 series.getData().add(new XYChart.Data<>(timeCounter, stockPrice));
-                
 
                 // Style dataPoint based on price fluctuation
                 XYChart.Data<Number, Number> dataPoint = series.getData().get(series.getData().size() - 1);
-                
+
                 System.out.println(dataPoint);
                 if (series.getData().size() > 1) {
                     double lastPrice = series.getData().get(series.getData().size() - 2).getYValue().doubleValue();
@@ -151,45 +151,57 @@ public class JavaFXLineGraph extends Application {
                             dataPoint.getNode().setStyle("-fx-background-color: red;");
                         }
                     }
-                    
-                    
                 }
-
             }
-
-            
         });
-
     }
 
     private XYChart.Series<Number, Number> createSeries(String name) {
         XYChart.Series<Number, Number> series = new XYChart.Series<>();
         series.setName(name);
         return series;
+    }   
+
+
+    //Handle Switch Stock
+    private final ReadOnlyObjectWrapper<XYChart.Series<Number, Number>> stockCallBack = new ReadOnlyObjectWrapper<>();
+    public ReadOnlyObjectProperty<XYChart.Series<Number, Number>> currentCustomerProperty() {
+        return stockCallBack.getReadOnlyProperty();
     }
 
+    public XYChart.Series<Number, Number> getCurrentCustomer() {
+
+        return stockCallBack.get();
+    }
+
+
+
     private void switchStock(int newIndex) {
-            // Clear the currently displayed series
-            System.out.print(seriesManager.getSeriesList());
 
-            lineChart.getData().clear();
-            // Add the selected series back to the chart
-            lineChart.getData().add(seriesManager.getSeriesList().get(newIndex));
+        stockCallBack.set(seriesManager.getSeriesList().get(newIndex));
 
-            ObservableList<XYChart.Data<Number, Number>> data = seriesManager.getSeriesList().get(newIndex).getData();
 
-            for (int i = 0; i < data.size(); i++) {
-                XYChart.Data<Number, Number> dataPoint = data.get(i);
-                double curPrice = dataPoint.getYValue().doubleValue();
-                
-                if (i != 0) {
-                    double lastPrice = data.get(i - 1).getYValue().doubleValue();
-                    String style = (curPrice < lastPrice) ? "-fx-background-color: red;" : "-fx-background-color: green;";
-                    dataPoint.getNode().setStyle(style);
-                } else {
-                    dataPoint.getNode().setStyle("-fx-background-color: black;");
-                }
+
+        // Clear the currently displayed series
+        System.out.print(seriesManager.getSeriesList());
+
+        lineChart.getData().clear();
+        // Add the selected series back to the chart
+        lineChart.getData().add(seriesManager.getSeriesList().get(newIndex));
+
+        ObservableList<XYChart.Data<Number, Number>> data = seriesManager.getSeriesList().get(newIndex).getData();
+
+        for (int i = 0; i < data.size(); i++) {
+            XYChart.Data<Number, Number> dataPoint = data.get(i);
+            double curPrice = dataPoint.getYValue().doubleValue();
+
+            if (i != 0) {
+                double lastPrice = data.get(i - 1).getYValue().doubleValue();
+                String style = (curPrice < lastPrice) ? "-fx-background-color: red;" : "-fx-background-color: green;";
+                dataPoint.getNode().setStyle(style);
+            } else {
+                dataPoint.getNode().setStyle("-fx-background-color: black;");
             }
-
+        }
     }
 }

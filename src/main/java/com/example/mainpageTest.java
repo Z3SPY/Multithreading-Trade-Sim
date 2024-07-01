@@ -21,22 +21,88 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import py4j.GatewayServer;
+
 import java.io.File;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class mainpageTest extends Application {
 
+    public static JavaFXLineGraph lineGraphRef;
+    public static StackPane lineGraphStackPane;
+
+    Label priceLabelOutput; 
+    Label ctgrLabelOutput;
+    Label subTitleTradeDet;
+
+
     public Map<String, Object> curAccount;
+    public static Profile objProfileInstance;
     public mainpageTest(Profile profileInstance) {
+        this.objProfileInstance = profileInstance;
         this.curAccount = profileInstance.getProfileData();
         System.out.println(this.curAccount.get("name"));
 
     }
-    
+
     @Override
     public void start(Stage mainStage) {
+
+        createGateWayServer();
+
+
+        lineGraphRef = new JavaFXLineGraph();
+        lineGraphStackPane = lineGraphRef.createStackPane();
+        lineGraphRef.currentCustomerProperty().addListener((obs, oldStock, newStock) -> {
+            System.out.println("OBS: "+ obs);
+            System.out.println("oldStk: "+ oldStock);
+            System.out.println("newStk {\n Object: "+ newStock
+             + " \n Name: " + newStock.getName() 
+             + " \n Data:" +  newStock.getData()
+             + " \n Cur Price:" + ((double) Math.round(((double) newStock.getData().get(newStock.getData().size() - 1).getYValue() * 10000)) / 10000)
+             ); 
+
+            //Parsing Values from String
+            Pattern pattern = Pattern.compile("(.*)\\((.*)\\) // (.*)");
+            Matcher matcher = pattern.matcher(newStock.getName());
+
+            if (matcher.matches()) {
+                String category = matcher.group(1).trim(); // "Space Rocks"
+                String abbreviation = matcher.group(2).trim(); // "SR"
+                String type = matcher.group(3).trim(); // "MILITARY"
+                
+                System.out.println("Category: " + category);
+                System.out.println("Abbreviation: " + abbreviation);
+                System.out.println("Type: " + type);
+
+                subTitleTradeDet.setText(abbreviation);
+                ctgrLabelOutput.setText(type);
+                priceLabelOutput.setText(Double.toString((double) Math.round(((double) newStock.getData().get(newStock.getData().size() - 1).getYValue() * 10000)) / 10000));
+            }
+
+            
+        });
+        
+
+
+        Scene mainScene = createMainScene();
+        mainScene.getStylesheets().add(this.getClass().getResource("chart.css").toExternalForm());
+        
+        mainStage.setTitle("ISTO SYSTEM");
+        mainStage.setScene(mainScene);
+        mainStage.setResizable(false);
+        mainStage.show();
+    }
+    
+    
+
+    //#region MAIN SCENE FRONTEND
+    public Scene createMainScene() {
         GridPane grid = new GridPane();
         grid.setHgap(10); // Horizontal gap between columns
         grid.setVgap(10); // Vertical gap between rows
@@ -168,10 +234,6 @@ public class mainpageTest extends Application {
 
         alertPane.getStyleClass().addAll("mainpage-cellStyle", "alert");
         midGridPane.add(alertPane, 2, 0, 1, 1);
-
-
-
-
 
 
 
@@ -480,7 +542,8 @@ public class mainpageTest extends Application {
         Label titleTradeDet = new Label("TRADE DETAILS");
         titleTradeDet.setStyle("-fx-text-fill: #FFFFFF; -fx-font-size: 25px;");
 
-        Label subTitleTradeDet = new Label("Item: << Space Rocks >>");
+        // Defined Statically 
+        subTitleTradeDet = new Label("Item: << Space Rocks >>");
         subTitleTradeDet.setTranslateY(-5);
         subTitleTradeDet.setStyle("-fx-text-fill: #FFFFFF; -fx-font-size: 15px;");
 
@@ -515,7 +578,8 @@ public class mainpageTest extends Application {
         StackPane ctgrStackLabelOutput = new StackPane();
         ctgrStackLabelOutput.setStyle("-fx-text-fill: #FFFFFF; -fx-font-size: 15px; -fx-border-width: 2; -fx-padding: 5px; -fx-border-color: #DC5F00;");
 
-        Label ctgrLabelOutput = new Label("aaa");
+        //Defined Statically
+        ctgrLabelOutput = new Label("aaa");
         ctgrLabelOutput.setStyle("-fx-text-fill: #FFFFFF; -fx-font-size: 15px; -fx-border-width: 2; -fx-padding: 5px; ");
         ctgrStackLabelOutput.getChildren().addAll(ctgrLabelOutput);
 
@@ -530,7 +594,8 @@ public class mainpageTest extends Application {
         StackPane priceStackLabelOutput = new StackPane();
         priceStackLabelOutput.setStyle("-fx-text-fill: #FFFFFF; -fx-font-size: 15px; -fx-border-width: 2; -fx-padding: 5px; -fx-border-color: #DC5F00;");
 
-        Label priceLabelOutput = new Label("aaaAaaaaaa");
+        //Defined Statically 
+        priceLabelOutput = new Label("aaaAaaaaaa");
         priceLabelOutput.setStyle("-fx-text-fill: #FFFFFF; -fx-font-size: 15px; -fx-border-width: 2; -fx-padding: 5px; ");
         priceStackLabelOutput.getChildren().addAll(priceLabelOutput);
         
@@ -550,6 +615,8 @@ public class mainpageTest extends Application {
         StackPane buyAndSellPane = new StackPane();
         buyAndSellPane.getStyleClass().add("mainpage-cellStyle");
 
+
+        //Should Have only one button Buy or sell
         Button buyButton = new Button("Buy");
         Button sellButton = new Button("Sell");
         buyButton.getStyleClass().add("buy-sell-btn");
@@ -692,7 +759,13 @@ public class mainpageTest extends Application {
 
             // Create colored content for marketButton
             StackPane marketContent = new StackPane();
-            marketContent.setStyle("-fx-background-color: #FF5733;"); // Set background color
+            marketContent.setStyle("-fx-background-color: #FF5733;"); 
+            marketContent.getChildren().add(lineGraphStackPane);
+            
+            
+            
+            
+            // Set background color
             // You can add more nodes or content to marketContent if needed
 
             // Add content to visPane
@@ -869,11 +942,29 @@ public class mainpageTest extends Application {
         Scene scene = new Scene(grid, 900, 750);
         scene.setCamera(new PerspectiveCamera());
         scene.getStylesheets().add(getClass().getResource("/com/example/styles.css").toExternalForm());
-        mainStage.setTitle("ISTO SYSTEM");
-        mainStage.setScene(scene);
-        mainStage.setResizable(false);
-        mainStage.show();
+        
+        return scene;
     }
+    //#endregion
+
+
+    //#region Python 
+    public static void createGateWayServer() {
+        System.out.println("GateWay Server Connected");
+        GatewayServer gatewayServer = new GatewayServer(new mainpageTest(objProfileInstance));
+        gatewayServer.start();
+    }
+    //#endregion 
+
+
+    //#region Stock Values and Simulation Updates
+    public void updateStockPane(String JSONdata) {
+        System.out.println("Updating Stock Pane");
+        lineGraphRef.updateStockValue(JSONdata);
+    } 
+
+    //#endregion
+
 
     public static void main(String[] args) {
         launch(args);

@@ -112,12 +112,12 @@ class Events:
 
         data = json.dumps([vars(obj) for obj in stock_list])
         print(data)
-        java_app.updateStockValue(data)
 
+        try:
+            java_app.updateStockPane(data)
+        except:
+            print("A connection error occured")
 
-        #for stock in stock_list:
-        #    if (stock.stockName == "Space Rocks"):
-        #        java_app.updateStockValue(stock.stockName, stock.stockPrice)
 
         gateway.close()  # Close the gateway connection
 

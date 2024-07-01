@@ -2,6 +2,8 @@ package com.example;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashMap; // import the HashMap class
+import java.util.Map;
 
 import javafx.scene.chart.XYChart;
 
