@@ -3,18 +3,56 @@ import time
 import numpy as np
 import random
 from py4j.java_gateway import JavaGateway, CallbackServerParameters
+from threading import Condition
 
 
+#Profile Entry Point
 class ProfileEntryPoint:
     def __init__(self, gateway):
         self.gateway = gateway
+        self.condition = Condition()
+        self.event_triggered = False
+        self.profileName = None
+        self.profileList = None
 
-    def get_profile_data(self, obj):
+    def notify(self, obj, name, list):
+
+        if self.profileName is None:
+            self.profileName = name
+            self.profileList = list
+        
+        print("This is your profile instance, " , self.profileName )
+        print("This is your profile stock, " , self.profileList )
+
+
+
+
         print("Notified by Java")
         print(obj)
         self.gateway.jvm.System.out.println("Hello from python!")
-
+        with self.condition:
+            self.event_triggered = True
+            self.condition.notify()
         return "A Return Value"
+    
+    def instantiateProfile(self, name, obj):
+        if self.player_profile is None:
+            self.player_profile = Player(name, 1000)
+            print(f"Created new profile for {name} with amount {1000}")
+        else:
+            print("Profile already exists")
+
+        return self.player_profile
+
+        
+
+    def wait_for_event(self):
+        with self.condition:
+            while not self.event_triggered:
+                self.condition.wait()
+            # Reset event for future use
+            self.event_triggered = False
+            print("Event received from Java!")
 
     class Java:
         implements = ["com.example.ProfileInterface"]
@@ -102,7 +140,7 @@ class Player:
     def increase_uncertainty(self):
         for stock_name in self.uncertainty:
             self.uncertainty[stock_name] += random.uniform(0.01, 0.1)
-            print(f"Uncertainty level for {stock_name}: {self.uncertainty[stock_name]:.2f}")
+            #print(f"Uncertainty level for {stock_name}: {self.uncertainty[stock_name]:.2f}")
 
     def check_uncertainty_and_sell(self, stockList):
         for stock_name in list(self.uncertainty.keys()):
@@ -212,9 +250,8 @@ def main():
     #Gate Way For JAVA TO PYTHON
     profile_gateway = JavaGateway(callback_server_parameters=CallbackServerParameters())
     listener = ProfileEntryPoint(profile_gateway)
-
     profile_gateway.entry_point.registerListener(listener)
-    profile_gateway.entry_point.notifyAllListeners()
+
 
     #END Gate Way For JAVA TO PYTHON
 
@@ -256,22 +293,22 @@ def main():
     while not stop_flag:
         for stock in space_nasdaq:
             stock.simulate_stock_price(stock.stockPrice)
-            print(stock.display())
+            #print(stock.display())
 
-        print(f"Cash balance: ${player.cash_balance:.2f}")
-        print(f"Portfolio: {player.portfolio}")
-        for stock_name, uncertainty in player.uncertainty.items():
+        #print(f"Cash balance: ${player.cash_balance:.2f}")
+        #print(f"Portfolio: {player.portfolio}")
+        """for stock_name, uncertainty in player.uncertainty.items():
             print(f"Uncertainty for {stock_name}: {uncertainty:.2f}")
-        print()
+            print()"""
 
         player.simulate(space_nasdaq)
         time.sleep(1)
         
         count += 1
-        print(f"TICKS TILL NEXT EVENT {tick_limit - count}")
+        #print(f"TICKS TILL NEXT EVENT {tick_limit - count}")
         
         if count % 5 == 0:
-            print("Passing stock data")
+            #print("Passing stock data")
             event_system.passStockData(space_nasdaq, java_gateway)
         
         if count >= tick_limit:

@@ -46,17 +46,16 @@ public class mainpageTest extends Application {
     private TextField inputField;
     
 
-
     public Map<String, Object> curAccount;
     public static Profile objProfileInstance;
     public mainpageTest(Profile profileInstance) {
-        this.objProfileInstance = profileInstance;
+        mainpageTest.objProfileInstance = profileInstance;
         this.curAccount = profileInstance.getProfileData();
-        System.out.println(this.curAccount.get("name"));
-
-   
-
+        System.out.println(this.curAccount.get("name"));   
     }
+    
+   
+    
 
     // JAVA TO PYTHON 
     static List<ProfileInterface> listeners = new ArrayList<>();
@@ -69,13 +68,12 @@ public class mainpageTest extends Application {
     public void notifyAllListeners() {
         System.out.println("Notify ");
         for (ProfileInterface listener : listeners) {
-            Object returnValue = listener.notify(this);
+            System.out.println(this.curAccount);
+            Object returnValue = listener.notify(this, (String)this.curAccount.get("name"), this.curAccount.get("stocks"));
             System.out.println(returnValue);
         }
     }
 
-
-    
    
 
     @Override
