@@ -155,3 +155,11 @@
     -fx-text-fill: #504719;
     -fx-font-size: 15px;
 }
+
+.input-field {
+    -fx-text-fill: #DC5F00;
+    -fx-font-size: 15px;
+    -fx-background-color: #1E1E1E;
+    -fx-border-color: #504719;
+    -fx-border-width: 2;
+}

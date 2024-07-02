@@ -71,18 +71,35 @@ public class JavaFXLineGraph extends Application {
 
         xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
-        xAxis.setLabel("Time");
+        xAxis.setLabel("Tick");
+        xAxis.setAutoRanging(false);
         yAxis.setLabel("Stock Price");
         lineChart = new LineChart<>(xAxis, yAxis);
         //lineChart.setTitle("Stock Monitoring");
 
         // Initialize series names and add them to seriesList
         // Make this adapt to given python
-        seriesManager.getSeriesList().add(createSeries("Space Rocks(SR) // INFRASTRUCUTURE"));
+        seriesManager.getSeriesList().add(createSeries("Space Rocks(SR) // INFRA"));
         seriesManager.getSeriesList().add(createSeries("Hyper Accelerators(HA) // MILITARY"));
         seriesManager.getSeriesList().add(createSeries("Tiki Torches(TkT) // COMMERCE"));
         seriesManager.getSeriesList().add(createSeries("Space Worm Jelly(SWJ) // COMMERCE"));
-        seriesManager.getSeriesList().add(createSeries("Stone Pick Axe(SPA) // INFRASTRUCUTURE"));
+        seriesManager.getSeriesList().add(createSeries("Stone Pick Axe(SPA) // INFRA"));
+        seriesManager.getSeriesList().add(createSeries("Quantum Crystals(QC) // TECH"));
+        seriesManager.getSeriesList().add(createSeries("Galactic Spices(GS) // COMMERCE"));
+        seriesManager.getSeriesList().add(createSeries("Nebula Diamonds(ND) // LUXURY"));
+        seriesManager.getSeriesList().add(createSeries("Warp Engines(WE) // TECH"));
+        seriesManager.getSeriesList().add(createSeries("Starship Blueprints(SB) // TECH"));
+        seriesManager.getSeriesList().add(createSeries("Plasma Cannons(PC) // MILITARY"));
+        seriesManager.getSeriesList().add(createSeries("Dimensional Artifacts(DA) // CURIOSITIES"));
+        seriesManager.getSeriesList().add(createSeries("Cosmic Energy Cells(CEC) // ENERGY"));
+        seriesManager.getSeriesList().add(createSeries("Alien Relics(AR) // CURIOSITIES"));
+        seriesManager.getSeriesList().add(createSeries("Neutronium Ore(NO) // MATERIALS"));
+        seriesManager.getSeriesList().add(createSeries("Holographic Entertainment(HE) // CULTURE"));
+        seriesManager.getSeriesList().add(createSeries("Teleportation Devices(TD) // TECH"));
+        seriesManager.getSeriesList().add(createSeries("Asteroid Mining Rights(AMR) // MATERIALS"));
+        seriesManager.getSeriesList().add(createSeries("Exotic Pets(EP) // CURIOSITIES"));
+        seriesManager.getSeriesList().add(createSeries("Void Crystals(VC) // ENERGY"));
+
 
         // Initially display all series on the chart
         lineChart.getData().add(seriesManager.getSeriesList().get(0));
@@ -146,14 +163,31 @@ public class JavaFXLineGraph extends Application {
                     double lastPrice = series.getData().get(series.getData().size() - 2).getYValue().doubleValue();
                     if (dataPoint.getNode() != null) {
                         if (stockPrice > lastPrice) {
-                            dataPoint.getNode().setStyle("-fx-background-color: green;");
+                            dataPoint.getNode().setStyle("-fx-background-color: #81A263;");
                         } else {
-                            dataPoint.getNode().setStyle("-fx-background-color: red;");
+                            dataPoint.getNode().setStyle("-fx-background-color: #C40C0C;");
                         }
                     }
                 }
             }
+            updateXAxisRange();
+
         });
+
+    }
+
+    private void updateXAxisRange() {
+        // Define the maximum range for the X-axis
+        int maxRange = 60;
+        System.out.println(timeCounter);
+        // Update the X-axis upper bound to ensure it stays within the range
+        if (timeCounter > maxRange) {
+            xAxis.setLowerBound(timeCounter - maxRange);
+            xAxis.setUpperBound(timeCounter);
+        } else {
+            xAxis.setLowerBound(0);
+            xAxis.setUpperBound(maxRange);
+        }
     }
 
     private XYChart.Series<Number, Number> createSeries(String name) {
@@ -197,7 +231,7 @@ public class JavaFXLineGraph extends Application {
 
             if (i != 0) {
                 double lastPrice = data.get(i - 1).getYValue().doubleValue();
-                String style = (curPrice < lastPrice) ? "-fx-background-color: red;" : "-fx-background-color: green;";
+                String style = (curPrice < lastPrice) ? "-fx-background-color: #C40C0C;" : "-fx-background-color: #81A263;";
                 dataPoint.getNode().setStyle(style);
             } else {
                 dataPoint.getNode().setStyle("-fx-background-color: black;");

@@ -1,9 +1,10 @@
 .chart {
     -fx-background-color: #1E1E1E;
+    -fx-padding: 20px;
 }
 
 .chart-series-line {
-    -fx-stroke: #1E1E1E;
+    -fx-stroke: #FF6500;
     -fx-stroke-width: 3px;
 }
 
@@ -53,7 +54,10 @@
 .axis-tick-label, .axis-tick-mark, .axis-label {
     -fx-stroke: #DC5F00;
     -fx-font-weight: bold;
+    -fx-text-fill: #DC5F00;
+
 }
+
 
 .chart-series-line {
 }

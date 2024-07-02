@@ -2,7 +2,23 @@ import json
 import time
 import numpy as np
 import random
-from py4j.java_gateway import JavaGateway
+from py4j.java_gateway import JavaGateway, CallbackServerParameters
+
+
+class ProfileEntryPoint:
+    def __init__(self, gateway):
+        self.gateway = gateway
+
+    def get_profile_data(self, obj):
+        print("Notified by Java")
+        print(obj)
+        self.gateway.jvm.System.out.println("Hello from python!")
+
+        return "A Return Value"
+
+    class Java:
+        implements = ["com.example.ProfileInterface"]
+
 
 class Player:
     def __init__(self, name, amount):
@@ -18,7 +34,6 @@ class Player:
         self.uncertainty_threshold = 1.0  # Threshold at which the player decides to sell
     
     def simulate(self, stockList):
-        print(self.portfolio)
         if len(self.portfolio) >= 1:
             # Increase uncertainty at a random rate for each stock
             self.increase_uncertainty()
@@ -29,10 +44,8 @@ class Player:
             choice = stockList[random.randint(0, len(stockList) - 1)]
             if self.buy_stock(choice, random.randint(1, 20)):
                 choice = stockList[random.randint(0, len(stockList) - 1)]
-                print("1")
             if not self.buy_stock(choice, random.randint(1, 20)):
-                print("2")
-                return
+                pass
     
     def buy_stock(self, stock, quantity):
         total_cost = stock.stockPrice * quantity
@@ -46,8 +59,8 @@ class Player:
             if stock.stockName in self.portfolio:
                 self.portfolio[stock.stockName] += quantity
             else:
-                self.portfolio[stock.stockName] = quantity  # Dictionary Key = Value
-                self.uncertainty[stock.stockName] = random.uniform(0, 0.2)  # If no value exists yet, assign a random uncertainty
+                self.portfolio[stock.stockName] = quantity
+                self.uncertainty[stock.stockName] = random.uniform(0, 0.2)
             # Update total investment
             self.total_investment += total_cost
             return True
@@ -99,27 +112,20 @@ class Player:
                         self.sell_stock(stock, self.portfolio[stock_name])
                         break
 
-class Events:
-    import random
 
 class Events:
     def __init__(self):
         self.event = "DEFAULT"
 
-    def passStockData(self, stock_list):
-        gateway = JavaGateway()  # Connect to the Java GatewayServer
+    def passStockData(self, stock_list, gateway):
         java_app = gateway.entry_point  # Access JavaApp instance
 
         data = json.dumps([vars(obj) for obj in stock_list])
-        print(data)
 
         try:
             java_app.updateStockPane(data)
-        except:
-            print("A connection error occured")
-
-
-        gateway.close()  # Close the gateway connection
+        except Exception as e:
+            print(f"Error passing stock data: {e}")
 
     def generate_random_event(self, stock_list):
         events = [
@@ -140,53 +146,47 @@ class Events:
         self.affect_stock_prices(stock_list)
 
     def affect_stock_prices(self, stock_list):
-        
-
-        print(f"WARNING NEW EVENT: {self.event}")
-
         for stock in stock_list:
             if self.event == "WAR":
                 if "MILITARY" in stock.category:
-                    stock.price_fluctuation *= 1.5  # Increase fluctuation for military-related stocks
+                    stock.price_fluctuation *= 1.5
             elif self.event == "INFLATION":
-                stock.price_fluctuation *= 0.5  # Decrease all price fluctuation
+                stock.price_fluctuation *= 0.5
             elif self.event == "TECHNOLOGICAL BREAKTHROUGH":
                 if "INFRA" in stock.category:
-                    stock.price_fluctuation *= 1.2  # Increase fluctuation for infrastructure stocks
+                    stock.price_fluctuation *= 1.2
             elif self.event == "ASTEROID MINING BOOM":
                 if "COMMERCE" in stock.category:
-                    stock.price_fluctuation *= 1.3  # Increase fluctuation for commerce-related stocks
+                    stock.price_fluctuation *= 1.3
             elif self.event == "SPACE TOURISM REGULATIONS":
                 if "COMMERCE" in stock.category:
-                    stock.price_fluctuation *= 0.8  # Decrease fluctuation for commerce-related stocks
+                    stock.price_fluctuation *= 0.8
             elif self.event == "COLONIZATION OF MARS":
                 if "INFRA" in stock.category:
-                    stock.price_fluctuation *= 1.4  # Increase fluctuation for infrastructure stocks
+                    stock.price_fluctuation *= 1.4
                 elif "COMMERCE" in stock.category:
-                    stock.price_fluctuation *= 1.8  # Increase fluctuation for commerce-related stocks
+                    stock.price_fluctuation *= 1.8
             elif self.event == "TECH STOCK CRASH":
                 if "TECH" in stock.category:
-                    stock.price_fluctuation *= 0.7  # Decrease fluctuation for tech-related stocks
+                    stock.price_fluctuation *= 0.7
             elif self.event == "ALIEN ENCOUNTER":
                 if "MILITARY" in stock.category:
-                    stock.price_fluctuation *= 1.5  # Increase fluctuation for military-related stocks
+                    stock.price_fluctuation *= 1.5
                 elif "INFRA" in stock.category:
-                    stock.price_fluctuation *= 0.8  # Decrease fluctuation for infrastructure stocks
+                    stock.price_fluctuation *= 0.8
             elif self.event == "SPACE WEATHER DISRUPTION":
                 if "INFRA" in stock.category:
-                    stock.price_fluctuation *= 0.9  # Decrease fluctuation for infrastructure stocks
+                    stock.price_fluctuation *= 0.9
                 elif "COMMERCE" in stock.category:
-                    stock.price_fluctuation *= 0.9  # Decrease fluctuation for commerce-related stocks
+                    stock.price_fluctuation *= 0.9
             elif self.event == "RESOURCE SCARCITY":
                 if "COMMERCE" in stock.category:
-                    stock.price_fluctuation *= 0.8  # Decrease fluctuation for commerce-related stocks
+                    stock.price_fluctuation *= 0.8
             elif self.event == "SPACE PIRATE ATTACK":
                 if "COMMERCE" in stock.category:
-                    stock.price_fluctuation *= 0.7  # Decrease fluctuation for commerce-related stocks
+                    stock.price_fluctuation *= 0.7
             else:
-                stock.price_fluctuation = stock.price_fluctuation_base  # Reset to base fluctuation (0.02)
-
-           
+                stock.price_fluctuation = stock.price_fluctuation_base
 
 
 class Stock:
@@ -194,29 +194,41 @@ class Stock:
         self.stockName = name
         self.stockPrice = price
         self.price_fluctuation_base = 0.02
-        self.price_fluctuation = 0.02  # Define the price fluctuation range here
+        self.price_fluctuation = 0.02
         self.category = category
 
     def display(self):
         return f"{self.stockName} current price: ${self.stockPrice:.2f}"
     
     def simulate_stock_price(self, current_price):
-        """Simulate the stock price fluctuation."""
-        # Simulate a more realistic price change based on a normal distribution
         change_percent = np.random.normal(-self.price_fluctuation / 200, self.price_fluctuation)
-        print(round(change_percent, 4))
         self.stockPrice = current_price * (1 + change_percent)
         return round(self.stockPrice, 2)
 
-def main():
-    
 
+def main():
+    # Start the Py4J gateway for ProfileEntryPoint
+
+    #Gate Way For JAVA TO PYTHON
+    profile_gateway = JavaGateway(callback_server_parameters=CallbackServerParameters())
+    listener = ProfileEntryPoint(profile_gateway)
+
+    profile_gateway.entry_point.registerListener(listener)
+    profile_gateway.entry_point.notifyAllListeners()
+
+    #END Gate Way For JAVA TO PYTHON
+
+
+    # Connect to the Java GatewayServer
+    java_gateway = JavaGateway()
+    
+    # Instantiate classes
     player = Player("John Doe", 10000)
-    EventSystem = Events()
+    event_system = Events()
 
     count = 0
-    tick_limit = 40  # Number of ticks before generating a new event
-    Space_NasDaq = [
+    tick_limit = 40
+    space_nasdaq = [
         Stock("Space Rocks", 100, "INFRA"),
         Stock("Hyper Accelerators", 90, "MILITARY"),
         Stock("Tiki Torches", 120, "COMMERCE"),
@@ -242,7 +254,7 @@ def main():
     stop_flag = False
     
     while not stop_flag:
-        for stock in Space_NasDaq:
+        for stock in space_nasdaq:
             stock.simulate_stock_price(stock.stockPrice)
             print(stock.display())
 
@@ -250,20 +262,25 @@ def main():
         print(f"Portfolio: {player.portfolio}")
         for stock_name, uncertainty in player.uncertainty.items():
             print(f"Uncertainty for {stock_name}: {uncertainty:.2f}")
-        print()  # Print an empty line for spacing
+        print()
 
-        player.simulate(Space_NasDaq)
+        player.simulate(space_nasdaq)
         time.sleep(1)
         
         count += 1
         print(f"TICKS TILL NEXT EVENT {tick_limit - count}")
         
         if count % 5 == 0:
-            print("poggo")
-            EventSystem.passStockData(Space_NasDaq)
+            print("Passing stock data")
+            event_system.passStockData(space_nasdaq, java_gateway)
+        
         if count >= tick_limit:
-            EventSystem.generate_random_event(Space_NasDaq)
-            count = 0  # Reset the count after generating an event
+            event_system.generate_random_event(space_nasdaq)
+            count = 0
+
+    # Shutdown the gateway servers
+    #profile_gateway.shutdown()
+    #java_gateway.close()
 
 if __name__ == "__main__":
     main()

@@ -8,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
@@ -26,9 +27,9 @@ import py4j.GatewayServer;
 import java.io.File;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class mainpageTest extends Application {
@@ -40,6 +41,11 @@ public class mainpageTest extends Application {
     Label ctgrLabelOutput;
     Label subTitleTradeDet;
 
+    //private Py4JGatewayServer py4jServer;
+
+    private TextField inputField;
+    
+
 
     public Map<String, Object> curAccount;
     public static Profile objProfileInstance;
@@ -48,12 +54,34 @@ public class mainpageTest extends Application {
         this.curAccount = profileInstance.getProfileData();
         System.out.println(this.curAccount.get("name"));
 
+   
+
     }
+
+    // JAVA TO PYTHON 
+    static List<ProfileInterface> listeners = new ArrayList<>();
+
+    // Registers all available Interfaces
+    public void registerListener(ProfileInterface listener) {
+        listeners.add(listener);
+    }
+
+    public void notifyAllListeners() {
+        System.out.println("Notify ");
+        for (ProfileInterface listener : listeners) {
+            Object returnValue = listener.notify(this);
+            System.out.println(returnValue);
+        }
+    }
+
+
+    
+   
 
     @Override
     public void start(Stage mainStage) {
 
-        createGateWayServer();
+        createGateWayServer(); // Creates a gateway for python to send data
 
 
         lineGraphRef = new JavaFXLineGraph();
@@ -80,7 +108,7 @@ public class mainpageTest extends Application {
                 System.out.println("Abbreviation: " + abbreviation);
                 System.out.println("Type: " + type);
 
-                subTitleTradeDet.setText(abbreviation);
+                subTitleTradeDet.setText("ITEM: " + abbreviation + " | " + newStock.getName());
                 ctgrLabelOutput.setText(type);
                 priceLabelOutput.setText(Double.toString((double) Math.round(((double) newStock.getData().get(newStock.getData().size() - 1).getYValue() * 10000)) / 10000));
             }
@@ -543,7 +571,7 @@ public class mainpageTest extends Application {
         titleTradeDet.setStyle("-fx-text-fill: #FFFFFF; -fx-font-size: 25px;");
 
         // Defined Statically 
-        subTitleTradeDet = new Label("Item: << Space Rocks >>");
+        subTitleTradeDet = new Label("Item:");
         subTitleTradeDet.setTranslateY(-5);
         subTitleTradeDet.setStyle("-fx-text-fill: #FFFFFF; -fx-font-size: 15px;");
 
@@ -579,7 +607,7 @@ public class mainpageTest extends Application {
         ctgrStackLabelOutput.setStyle("-fx-text-fill: #FFFFFF; -fx-font-size: 15px; -fx-border-width: 2; -fx-padding: 5px; -fx-border-color: #DC5F00;");
 
         //Defined Statically
-        ctgrLabelOutput = new Label("aaa");
+        ctgrLabelOutput = new Label("");
         ctgrLabelOutput.setStyle("-fx-text-fill: #FFFFFF; -fx-font-size: 15px; -fx-border-width: 2; -fx-padding: 5px; ");
         ctgrStackLabelOutput.getChildren().addAll(ctgrLabelOutput);
 
@@ -595,7 +623,7 @@ public class mainpageTest extends Application {
         priceStackLabelOutput.setStyle("-fx-text-fill: #FFFFFF; -fx-font-size: 15px; -fx-border-width: 2; -fx-padding: 5px; -fx-border-color: #DC5F00;");
 
         //Defined Statically 
-        priceLabelOutput = new Label("aaaAaaaaaa");
+        priceLabelOutput = new Label("");
         priceLabelOutput.setStyle("-fx-text-fill: #FFFFFF; -fx-font-size: 15px; -fx-border-width: 2; -fx-padding: 5px; ");
         priceStackLabelOutput.getChildren().addAll(priceLabelOutput);
         
@@ -616,16 +644,45 @@ public class mainpageTest extends Application {
         buyAndSellPane.getStyleClass().add("mainpage-cellStyle");
 
 
+        inputField = new TextField();
+        inputField.setPromptText("Qty");
+        inputField.setAlignment(Pos.CENTER);
+        inputField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*")) {
+                inputField.setText(newValue.replaceAll("[^\\d]", ""));
+            }
+
+            if (inputField.getText().length() > 3) {
+                String limitedText = inputField.getText().substring(0, 5);
+                inputField.setText(limitedText);
+            }
+        });
+
         //Should Have only one button Buy or sell
-        Button buyButton = new Button("Buy");
-        Button sellButton = new Button("Sell");
-        buyButton.getStyleClass().add("buy-sell-btn");
-        sellButton.getStyleClass().add("buy-sell-btn");
-        sellButton.setTranslateY(-5);
+        Button buySellButton = new Button("Buy");
+        buySellButton.getStyleClass().add("buy-sell-btn");
+        inputField.getStyleClass().add("input-field");
+        inputField.setTranslateY(-5);
+        
+
+        // Make it call Python
+
+        buySellButton.setOnAction(event -> {
+            notifyAllListeners();
+
+            if (marketButton.getStyleClass().contains("button-selected")) {
+                System.out.println("Buy button clicked");
+                // Add your buy functionality here
+            } else if (profileButton.getStyleClass().contains("button-selected")) {
+                System.out.println("Sell button clicked");
+                // Add your sell functionality here
+            }
+        });
 
 
-        tradeDetPaneGrid.add(buyButton, 1, 0, 1, 1);
-        tradeDetPaneGrid.add(sellButton, 1, 1, 1, 1);
+
+        tradeDetPaneGrid.add(buySellButton, 1, 0, 1, 1);
+        tradeDetPaneGrid.add(inputField, 1, 1, 1, 1);
 
 
         infoGridPane.add(tradeDetPane, 0, 1, 2, 1);
@@ -756,6 +813,8 @@ public class mainpageTest extends Application {
             marketButton.getStyleClass().addAll( "button-selected");
             marketPane.getStyleClass().add("mainpage-cellStyle");
 
+             //Button Text
+             buySellButton.setText("Buy");
 
             // Create colored content for marketButton
             StackPane marketContent = new StackPane();
@@ -846,7 +905,10 @@ public class mainpageTest extends Application {
             profileButton.getStyleClass().addAll("button", "button-selected");
             profPane.getStyleClass().add("mainpage-cellStyle");
 
+            //Button Text
+            buySellButton.setText("Sell");
 
+            
             // Create colored content for profileButton
            StackPane profileContent = new StackPane();
             profileContent.setStyle("-fx-background-color: #1E1E1E;"); // Set background color
@@ -909,17 +971,6 @@ public class mainpageTest extends Application {
             profileContent.getChildren().add(profileContentGrid);
             
 
-            // VBox profileBox = new VBox(10); // Spacing between nodes
-            // profileBox.setAlignment(Pos.CENTER);
-
-            
-            
-            // // Add nodes to the VBox
-            // profileBox.getChildren().addAll(profilePicture, usernameLabel, companyIdLabel);
-
-            // // Add the VBox to the profileContent StackPane
-            // profileContent.getChildren().add(profileBox);
-
             // Add content to visPane
             visPane.getChildren().add(profileContent);
              
@@ -954,6 +1005,13 @@ public class mainpageTest extends Application {
         GatewayServer gatewayServer = new GatewayServer(new mainpageTest(objProfileInstance));
         gatewayServer.start();
     }
+
+    @Override
+    public void stop() throws Exception {
+        super.stop();
+        // Shutdown Py4J server when JavaFX application stops
+        //py4jServer.shutdown();
+    }
     //#endregion 
 
 
@@ -969,4 +1027,5 @@ public class mainpageTest extends Application {
     public static void main(String[] args) {
         launch(args);
     }
+    
 }
