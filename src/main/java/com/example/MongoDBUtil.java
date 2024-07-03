@@ -47,7 +47,8 @@ public class MongoDBUtil {
                 .append("username", username)
                 .append("password", password)
                 .append("companyId", companyId)
-                .append("stock", new ArrayList<DataObject>());
+                .append("stock", new ArrayList<DataObject>())
+                .append("balance", 1000f);
         collection.insertOne(newUser);
         return true;
     }
@@ -62,7 +63,7 @@ public class MongoDBUtil {
         return company != null;
     }
 
-    public void updateStock(ArrayList<DataObject> list, String username) {
+    public void updateStock(Object list, String username) {
         Document filter = new Document("username", username);
         Document update = new Document("$set", new Document("stock", list));
         collection.updateOne(filter, update);

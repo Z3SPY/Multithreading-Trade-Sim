@@ -6,57 +6,6 @@ from py4j.java_gateway import JavaGateway, CallbackServerParameters
 from threading import Condition
 
 
-#Profile Entry Point
-class ProfileEntryPoint:
-    def __init__(self, gateway):
-        self.gateway = gateway
-        self.condition = Condition()
-        self.event_triggered = False
-        self.profileName = None
-        self.profileList = None
-
-    def notify(self, obj, name, list):
-
-        if self.profileName is None:
-            self.profileName = name
-            self.profileList = list
-        
-        print("This is your profile instance, " , self.profileName )
-        print("This is your profile stock, " , self.profileList )
-
-
-
-
-        print("Notified by Java")
-        print(obj)
-        self.gateway.jvm.System.out.println("Hello from python!")
-        with self.condition:
-            self.event_triggered = True
-            self.condition.notify()
-        return "A Return Value"
-    
-    def instantiateProfile(self, name, obj):
-        if self.player_profile is None:
-            self.player_profile = Player(name, 1000)
-            print(f"Created new profile for {name} with amount {1000}")
-        else:
-            print("Profile already exists")
-
-        return self.player_profile
-
-        
-
-    def wait_for_event(self):
-        with self.condition:
-            while not self.event_triggered:
-                self.condition.wait()
-            # Reset event for future use
-            self.event_triggered = False
-            print("Event received from Java!")
-
-    class Java:
-        implements = ["com.example.ProfileInterface"]
-
 
 class Player:
     def __init__(self, name, amount):
@@ -70,6 +19,13 @@ class Player:
         self.cash_balance = amount
         self.total_investment = 0.0
         self.uncertainty_threshold = 1.0  # Threshold at which the player decides to sell
+
+    def getBal(self):
+        return self.cash_balance
+
+    def updateStockList(self, newPortfolio):
+        self.portfolio = newPortfolio
+        print(self.portfolio)
     
     def simulate(self, stockList):
         if len(self.portfolio) >= 1:
@@ -84,6 +40,7 @@ class Player:
                 choice = stockList[random.randint(0, len(stockList) - 1)]
             if not self.buy_stock(choice, random.randint(1, 20)):
                 pass
+            
     
     def buy_stock(self, stock, quantity):
         total_cost = stock.stockPrice * quantity
@@ -242,6 +199,122 @@ class Stock:
         change_percent = np.random.normal(-self.price_fluctuation / 200, self.price_fluctuation)
         self.stockPrice = current_price * (1 + change_percent)
         return round(self.stockPrice, 2)
+    
+space_nasdaq = [
+        Stock("Space Rocks", 100, "INFRA"),
+        Stock("Hyper Accelerators", 90, "MILITARY"),
+        Stock("Tiki Torches", 120, "COMMERCE"),
+        Stock("Space Worm Jelly", 2000, "COMMERCE"),
+        Stock("Stone Pick Axe", 10, "INFRA"),
+        Stock("Quantum Crystals", 150, "TECH"),
+        Stock("Galactic Spices", 300, "COMMERCE"),
+        Stock("Nebula Diamonds", 5000, "LUXURY"),
+        Stock("Warp Engines", 800, "TECH"),
+        Stock("Starship Blueprints", 50, "TECH"),
+        Stock("Plasma Cannons", 180, "MILITARY"),
+        Stock("Dimensional Artifacts", 250, "CURIOSITIES"),
+        Stock("Cosmic Energy Cells", 400, "ENERGY"),
+        Stock("Alien Relics", 700, "CURIOSITIES"),
+        Stock("Neutronium Ore", 1200, "MATERIALS"),
+        Stock("Holographic Entertainment", 80, "CULTURE"),
+        Stock("Teleportation Devices", 350, "TECH"),
+        Stock("Asteroid Mining Rights", 2000, "MATERIALS"),
+        Stock("Exotic Pets", 180, "CURIOSITIES"),
+        Stock("Void Crystals", 280, "ENERGY")
+]
+
+#Profile Entry Point
+class ProfileEntryPoint:
+    def __init__(self, gateway):
+        self.gateway = gateway
+        self.condition = Condition()
+        self.event_triggered = False
+
+        self.player_profile = None
+        self.profileName = None
+        self.profileList = None
+        self.profileBal = None
+
+    def search_stock(self, stock_name):
+        #print(space_nasdaq)
+        for stock in space_nasdaq:
+            if stock.stockName == stock_name:
+                print("Stock Found")
+                return stock
+            return None
+
+    def notify(self, obj, jsonData, btnState, qty, stockName):
+
+        print("Notified Python", jsonData)
+        try:
+            loaded = json.loads(jsonData)
+            print(loaded)
+
+            if self.profileName is None:
+                self.profileName = loaded["name"]
+                self.profileBal = loaded["balance"]
+                self.profileList = loaded["stocks"]
+                print("This is your profile instance, " , self.profileName )
+                print("This is your profile stock, " , self.profileList)
+                print("This is your profile balance, " , self.profileBal)
+
+
+            if self.player_profile is None:
+                self.instantiateProfile(self.profileName, self.profileBal, self.profileList)
+            
+
+            if jsonData is not None and self.player_profile is not None: 
+                if btnState == True: # Sell
+                    print(self.player_profile.cash_balance)
+                    print("Sell")
+                    self.player_profile.sell_stock(self.search_stock(stockName), qty)
+                elif btnState == False: #buy
+                    print(self.player_profile.cash_balance)
+                    print("Buy")
+                    print("Current Profile: ", self.player_profile.name)
+                    print("Added To Profile Portfolio: ", self.player_profile.portfolio)
+                    print("Current Balance: ", self.player_profile.getBal())
+
+                    self.player_profile.buy_stock(self.search_stock(stockName), qty)
+
+
+        except json.JSONDecodeError as e:
+            print(f"Error parsing JSON: {e}")
+
+
+
+        print("Notified by Java")
+        self.gateway.jvm.System.out.println("Hello from python!")
+        with self.condition:
+            self.event_triggered = True
+            self.condition.notify()
+        return "A Return Value"
+    
+    def instantiateProfile(self, name, bal, stock):
+        if self.player_profile is None:
+            self.player_profile = Player(name, bal)
+            self.player_profile.updateStockList(stock)
+
+            print(f"Created new profile for {name} with amount {bal}")
+        else:
+            print("Profile already exists")
+
+        return self.player_profile
+
+    def toString(self):
+        return
+
+    def wait_for_event(self):
+        with self.condition:
+            while not self.event_triggered:
+                self.condition.wait()
+            # Reset event for future use
+            self.event_triggered = False
+            print("Event received from Java!")
+
+    class Java:
+        implements = ["com.example.ProfileInterface"]
+
 
 
 def main():
@@ -265,28 +338,7 @@ def main():
 
     count = 0
     tick_limit = 40
-    space_nasdaq = [
-        Stock("Space Rocks", 100, "INFRA"),
-        Stock("Hyper Accelerators", 90, "MILITARY"),
-        Stock("Tiki Torches", 120, "COMMERCE"),
-        Stock("Space Worm Jelly", 2000, "COMMERCE"),
-        Stock("Stone Pick Axe", 10, "INFRA"),
-        Stock("Quantum Crystals", 150, "TECH"),
-        Stock("Galactic Spices", 300, "COMMERCE"),
-        Stock("Nebula Diamonds", 5000, "LUXURY"),
-        Stock("Warp Engines", 800, "TECH"),
-        Stock("Starship Blueprints", 50, "TECH"),
-        Stock("Plasma Cannons", 180, "MILITARY"),
-        Stock("Dimensional Artifacts", 250, "CURIOSITIES"),
-        Stock("Cosmic Energy Cells", 400, "ENERGY"),
-        Stock("Alien Relics", 700, "CURIOSITIES"),
-        Stock("Neutronium Ore", 1200, "MATERIALS"),
-        Stock("Holographic Entertainment", 80, "CULTURE"),
-        Stock("Teleportation Devices", 350, "TECH"),
-        Stock("Asteroid Mining Rights", 2000, "MATERIALS"),
-        Stock("Exotic Pets", 180, "CURIOSITIES"),
-        Stock("Void Crystals", 280, "ENERGY")
-    ]
+   
     
     stop_flag = False
     

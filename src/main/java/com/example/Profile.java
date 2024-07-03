@@ -10,12 +10,18 @@ import java.util.ArrayList;
 public class Profile {
     public String UserName;
     public String CompanyID;
-    public ArrayList<DataObject> stocks;
+    public Object stocks;
+    public Float balance;
 
-    public Profile(String userName, String compID) {
+    public Profile(String userName, String compID, Object stockArray, Float accBal) {
         this.UserName = userName;
         this.CompanyID = compID;
-        this.stocks = new ArrayList<>(); // Initialize the stocks ArrayList
+        this.stocks = stockArray;
+        this.balance = accBal;
+
+        System.out.println("Stocks: " + stockArray);
+        System.out.println("Balance: " + accBal);
+
     }
 
     // If Buy Or Sell Call This 
@@ -30,6 +36,7 @@ public class Profile {
         profileData.put("name", this.UserName);
         profileData.put("companyID", this.CompanyID);
         profileData.put("stocks", this.stocks);
+        profileData.put("balance", this.balance);
         return profileData;
     }
 }

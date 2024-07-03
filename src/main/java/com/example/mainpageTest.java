@@ -23,7 +23,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import py4j.GatewayServer;
-
+import com.google.gson.Gson;
 import java.io.File;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -36,6 +36,7 @@ public class mainpageTest extends Application {
 
     public static JavaFXLineGraph lineGraphRef;
     public static StackPane lineGraphStackPane;
+    public static String curStockName;
 
     Label priceLabelOutput; 
     Label ctgrLabelOutput;
@@ -54,7 +55,7 @@ public class mainpageTest extends Application {
         System.out.println(this.curAccount.get("name"));   
     }
     
-   
+
     
 
     // JAVA TO PYTHON 
@@ -65,20 +66,30 @@ public class mainpageTest extends Application {
         listeners.add(listener);
     }
 
-    public void notifyAllListeners() {
-        System.out.println("Notify ");
+    public void notifyAllListeners(String qtyInput, Boolean btnState, String stockName) {
+
+
+
+        System.out.println("Notify " + listeners);
         for (ProfileInterface listener : listeners) {
             System.out.println(this.curAccount);
-            Object returnValue = listener.notify(this, (String)this.curAccount.get("name"), this.curAccount.get("stocks"));
+
+        
+            //Create a Json to send
+            Gson gson = new Gson(); 
+            String json = gson.toJson(this.curAccount); 
+        
+
+            Object returnValue = listener.notify(this, json, btnState, Integer.parseInt(qtyInput), stockName);
             System.out.println(returnValue);
         }
     }
 
    
 
+
     @Override
     public void start(Stage mainStage) {
-
         createGateWayServer(); // Creates a gateway for python to send data
 
 
@@ -106,11 +117,13 @@ public class mainpageTest extends Application {
                 System.out.println("Abbreviation: " + abbreviation);
                 System.out.println("Type: " + type);
 
-                subTitleTradeDet.setText("ITEM: " + abbreviation + " | " + newStock.getName());
+                subTitleTradeDet.setText("ITEM: " + abbreviation + " | " + category);
+                curStockName = category;
                 ctgrLabelOutput.setText(type);
                 priceLabelOutput.setText(Double.toString((double) Math.round(((double) newStock.getData().get(newStock.getData().size() - 1).getYValue() * 10000)) / 10000));
             }
 
+            System.out.println(curStockName);
             
         });
         
@@ -666,14 +679,20 @@ public class mainpageTest extends Application {
         // Make it call Python
 
         buySellButton.setOnAction(event -> {
-            notifyAllListeners();
 
-            if (marketButton.getStyleClass().contains("button-selected")) {
-                System.out.println("Buy button clicked");
-                // Add your buy functionality here
-            } else if (profileButton.getStyleClass().contains("button-selected")) {
-                System.out.println("Sell button clicked");
-                // Add your sell functionality here
+            System.out.println("BUYING " + curStockName);
+            if (subTitleTradeDet.getText() != "" && inputField.getText() != "")  {
+                
+                if (marketButton.getStyleClass().contains("button-selected")) {
+                    System.out.println("Buy button clicked");           
+
+                    notifyAllListeners(inputField.getText(), false, curStockName); //Sends the event listener to python...
+                    // Add your buy functionality here
+                } else if (profileButton.getStyleClass().contains("button-selected")) {
+                    System.out.println("Sell button clicked");
+                    notifyAllListeners(inputField.getText(), true, curStockName); //Sends the event listener to python...
+                    // Add your sell functionality here
+                }
             }
         });
 

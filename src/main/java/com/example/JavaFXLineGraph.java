@@ -143,7 +143,7 @@ public class JavaFXLineGraph extends Application {
             // Ensure seriesList is not null
             List<XYChart.Series<Number, Number>> seriesList = seriesManager.getSeriesList();
 
-            System.out.print(seriesList);
+            //System.out.print(seriesList);
 
             Gson gson = new Gson();
             List<DataObject> data = gson.fromJson(jsonData, new TypeToken<List<DataObject>>(){}.getType());
@@ -158,7 +158,7 @@ public class JavaFXLineGraph extends Application {
                 // Style dataPoint based on price fluctuation
                 XYChart.Data<Number, Number> dataPoint = series.getData().get(series.getData().size() - 1);
 
-                System.out.println(dataPoint);
+                //System.out.println(dataPoint);
                 if (series.getData().size() > 1) {
                     double lastPrice = series.getData().get(series.getData().size() - 2).getYValue().doubleValue();
                     if (dataPoint.getNode() != null) {
@@ -179,7 +179,7 @@ public class JavaFXLineGraph extends Application {
     private void updateXAxisRange() {
         // Define the maximum range for the X-axis
         int maxRange = 60;
-        System.out.println(timeCounter);
+        //System.out.println(timeCounter);
         // Update the X-axis upper bound to ensure it stays within the range
         if (timeCounter > maxRange) {
             xAxis.setLowerBound(timeCounter - maxRange);
@@ -217,7 +217,7 @@ public class JavaFXLineGraph extends Application {
 
 
         // Clear the currently displayed series
-        System.out.print(seriesManager.getSeriesList());
+        //System.out.print(seriesManager.getSeriesList());
 
         lineChart.getData().clear();
         // Add the selected series back to the chart
