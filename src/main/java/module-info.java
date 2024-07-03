@@ -7,6 +7,7 @@ module com.example {
     requires org.mongodb.bson;
     requires org.mongodb.driver.core;
     requires com.google.gson;
+    
 
     opens com.example to javafx.fxml, com.google.gson; // Open com.example package to JavaFX FXML and Gson
     exports com.example;

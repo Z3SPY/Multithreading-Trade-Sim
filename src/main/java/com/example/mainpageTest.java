@@ -1,12 +1,17 @@
 package com.example;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import javafx.application.Application;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -23,14 +28,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import py4j.GatewayServer;
-
-import java.io.File;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class mainpageTest extends Application {
 
@@ -370,10 +367,14 @@ public class mainpageTest extends Application {
         
         //#region TimePane
         StackPane timePane = new StackPane();
-        Label timeText = new Label("23:00:00");
-        timeText.setStyle("-fx-text-fill: #DC5F00;"); // Set text color
+        FastClock fastClock = new FastClock();
 
-        timePane.getChildren().addAll(timeText);
+
+        // Label timeText = new Label("23:00:00");
+        // timeText.setStyle("-fx-text-fill: #DC5F00;"); // Set text color
+
+        // timePane.getChildren().addAll(timeText);
+        timePane.getChildren().add(fastClock);
         timePane.setTranslateX(10);
 
         GridPane.setHgrow(timePane, Priority.NEVER);
