@@ -104,7 +104,7 @@ public class mainpageTest extends Application {
                     ReturnData returnData = gson.fromJson(jsonString, ReturnData.class);
 
                     // Access the parsed data
-                    Map<String, Float> portfolio = returnData.getPortfolio();
+                    Map<String, Float> portfolio = (Map<String, Float>) returnData.getPortfolio();
                     double balance = returnData.getBalance();
 
                     // Print the values
@@ -233,9 +233,16 @@ public class mainpageTest extends Application {
         //#region Title Pane Top
         StackPane titlePane = new StackPane();
         titlePane.getStyleClass().add("mainpage-cellStyle");
+        titlePane.setStyle("-fx-background-color: #DC5F00;"); 
         titlePane.setTranslateX(30);
+
+        Label titleLabelMain = new Label("ISTO SYSTEMS");
+        titleLabelMain.setStyle("-fx-font-size: 20px;"); // Set the font size and text color
+        titlePane.getChildren().add(titleLabelMain);
+
         grid.add(titlePane, 2, 0, 2, 1);
-        //#endregion
+
+        //#endregion0
 
         //#region MIDDLE PANE TOP
         StackPane middlePane = new StackPane();
@@ -1013,23 +1020,7 @@ public class mainpageTest extends Application {
             // Create colored content for profileButton
             StackPane profileContent = new StackPane();
             profileContent.setStyle("-fx-background-color: #1E1E1E;"); // Set background color
-            
-
-
-
-
-
-
-            // 
-
-
-
-
-
-
-
-
-
+        
             GridPane profileContentGrid = new GridPane();
             profileContentGrid.setVgap(5);
 
@@ -1138,7 +1129,7 @@ public class mainpageTest extends Application {
     public void stop() throws Exception {
         super.stop();
         // Shutdown Py4J server when JavaFX application stops
-        //py4jServer.shutdown();
+        gatewayServer.shutdown();
     }
     //#endregion 
 
@@ -1150,6 +1141,13 @@ public class mainpageTest extends Application {
     } 
 
     //#endregion
+
+    public void GetLeaderBoardFromPy(String list) {
+        Gson gson = new Gson();
+        Object[] leaderboard = gson.fromJson(list, Object[].class);
+        String json = gson.toJson(leaderboard);
+        System.out.println("Printing Leaderboard: " + json);
+    }
 
 
     public static void main(String[] args) {

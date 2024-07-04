@@ -50,6 +50,8 @@ class Player:
             
     
     def buy_stock(self, stock, quantity):
+        print(self.name + " bought " + str(quantity) + " " + stock.stockName)
+
         total_cost = stock.stockPrice * quantity
         if self.cash_balance >= total_cost:
             print(self.name + " bought "  + stock.stockName  +" stock")
@@ -71,6 +73,8 @@ class Player:
             return False
     
     def sell_stock(self, stock, quantity):
+        print(self.name + " sold " + str(quantity) + " " + stock.stockName)
+
         if stock.stockName in self.portfolio and self.portfolio[stock.stockName] >= quantity:
             # Calculate sale amount
             sale_amount = stock.stockPrice * quantity
@@ -103,6 +107,8 @@ class Player:
                 self.sell_stock(stock, quantity)
     
     def increase_uncertainty(self):
+        print(self.uncertainty)
+
         for stock_name in self.uncertainty:
             self.uncertainty[stock_name] += random.uniform(0.01, 0.1)
             #print(f"Uncertainty level for {stock_name}: {self.uncertainty[stock_name]:.2f}")
@@ -330,6 +336,32 @@ class ProfileEntryPoint:
     class Java:
         implements = ["com.example.ProfileInterface"]
 
+class Leaderboard:
+    def __init__(self, players=None):
+        if players is None:
+            players = []
+        self.players = players
+
+    def add_player(self, player):
+        self.players.append(player)
+
+    def remove_player(self, player_name):
+        self.players = [player for player in self.players if player.name != player_name]
+
+    def update_amount(self, newPlayers, gateway):
+        self.players = newPlayers
+        print(self.players)
+        json_data = json.dumps(self.get_ranked_list(), default=lambda o: o.__dict__)
+        gateway.GetLeaderBoardFromPy(json_data)
+
+    def get_ranked_list(self):
+        return sorted(self.players, key=lambda player: player.cash_balance, reverse=True)
+
+    def print_leaderboard(self):
+        sorted_players = self.get_ranked_list()
+        for rank, player in enumerate(sorted_players, start=1):
+            print(f"{rank}. {player.name}: {player.amount}")
+
 
 
 def main():
@@ -348,7 +380,16 @@ def main():
     java_gateway = JavaGateway()
     
     # Instantiate classes
-    player = Player("John Doe", 10000)
+    active_players = {
+        Player("John Doe", 10000),
+        Player("Alongy", 10000),
+        Player("Haijee", 10000),
+        Player("Bob", 10000),
+        Player("Samenta", 10000)
+    }
+
+    leaderboard = Leaderboard(active_players)
+
     event_system = Events()
 
     count = 0
@@ -370,8 +411,10 @@ def main():
         """for stock_name, uncertainty in player.uncertainty.items():
             print(f"Uncertainty for {stock_name}: {uncertainty:.2f}")
             print()"""
-
-        player.simulate(space_nasdaq)
+        
+        for player in active_players:
+            player.simulate(space_nasdaq)
+            
         time.sleep(1)
         
         count += 1
@@ -379,6 +422,7 @@ def main():
         
         if count % 5 == 0:
             #print("Passing stock data")
+            leaderboard.update_amount(active_players, java_gateway) # updates leaderboards every passed datastock
             event_system.passStockData(space_nasdaq, java_gateway)
         
         if count >= tick_limit:
