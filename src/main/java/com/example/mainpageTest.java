@@ -279,9 +279,9 @@ public class mainpageTest extends Application {
         ColumnConstraints lowMidGridCol0 = new ColumnConstraints();
         lowMidGridCol0.setPercentWidth(32);
         ColumnConstraints lowMidGridCol1 = new ColumnConstraints();
-        lowMidGridCol1.setPercentWidth(23.8);
+        lowMidGridCol1.setPercentWidth(30);
         ColumnConstraints lowMidGridCol2 = new ColumnConstraints();
-        lowMidGridCol2.setPercentWidth(44.2);
+        lowMidGridCol2.setPercentWidth(40);
 
         RowConstraints lowMidGridRow0 = new RowConstraints();
         lowMidGridRow0.setPercentHeight(100); 
@@ -306,6 +306,8 @@ public class mainpageTest extends Application {
 
         //#region Date
         StackPane datePane = new StackPane();
+
+        
         datePane.getStyleClass().add("mainpage-cellStyle");
         GridPane.setHgrow(datePane, Priority.NEVER);
         GridPane.setVgrow(datePane, Priority.NEVER);
@@ -316,7 +318,7 @@ public class mainpageTest extends Application {
         GridPane dateGrid = new GridPane();
 
 
-        Label topRect1 = new Label("-{ Month / Day / Year }-");
+        Label topRect1 = new Label("   -{  Month   / Day  / Year }-");
         topRect1.setStyle("-fx-text-fill: #DC5F00; -fx-font-size: 12px;"); // Orange color
         topRect1.setTranslateY(3);
 
@@ -372,10 +374,6 @@ public class mainpageTest extends Application {
         //#region TimePane
         StackPane timePane = new StackPane();
 
-        // Label timeText = new Label("23:00:00");
-        // timeText.setStyle("-fx-text-fill: #DC5F00;"); // Set text color
-
-        // timePane.getChildren().addAll(timeText);
         timePane.getChildren().add(fastClock.getTimePane());
         timePane.setTranslateX(10);
 

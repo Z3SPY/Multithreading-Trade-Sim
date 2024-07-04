@@ -13,7 +13,7 @@ public class FastClock {
     private Text timeText;
     private Text dateText;
     private Timeline timeline;
-    private int clockSeconds = 0; // added a variable to keep track of clock seconds
+    private int clockSeconds = 0; 
     private int clockMinutes = 0;
     private int clockHours = 0;
     private int day = 1; // added a variable to keep track of day
@@ -28,19 +28,16 @@ public class FastClock {
 
     private void initClock() {
         StackPane clockarea = new StackPane();
-        clockarea.setMinSize(25, 25);
+        clockarea.setMinSize(60, 25);
         clockarea.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
         timeText = new Text("00:00");
         timeText.setFill(Color.WHITE);
         timeText.setFont(Font.font("Arial", 24));
 
-        dateText = new Text("Aprimay 1, 4122"); // initial date
+        dateText = new Text("Aprimay 1, 4122");
         dateText.setFill(Color.WHITE);
         dateText.setFont(Font.font("Arial", 24));
-
-        // add clockarea, timeText, and dateText to the scene graph
-        // ...
     }
 
     public StackPane getTimePane() {
@@ -51,6 +48,8 @@ public class FastClock {
         timeText = new Text("00:00");
         timeText.setFill(Color.web("#DC5F00"));
         timeText.setFont(Font.font("Arial", 35));
+        timePane.setMinSize(25, 25);
+        timePane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         
 
         timePane.getChildren().add(timeText);
@@ -75,29 +74,27 @@ public class FastClock {
         timeline.setCycleCount(Animation.INDEFINITE);
 
         KeyFrame keyFrame = new KeyFrame(Duration.seconds(.1), e -> {
-            // clockSeconds = (clockSeconds + 10) % 300; // increment clock seconds by 10, and reset to 0 after 5 minutes
-            clockMinutes = clockMinutes+10;
-            if (clockMinutes == 60){
-                clockHours =clockHours +1;
-                clockMinutes=0;
-            }
-            if (clockHours==24){
-                day= day+1;
-                clockHours=0;
+            clockMinutes = clockMinutes+30;
+            if (clockMinutes == 60) {
+                clockHours++;
+                clockMinutes = 0;
+                if (clockHours == 24) {
+                    day++;
+                    clockHours = 0;
+                    if (day == 16) {
+                        monthIndex++;
+                        day = 1;
+                        if (monthIndex == 4) {
+                            year++;
+                            monthIndex = 0;
+                        }
+                    }
+                }
             }
 
             timeText.setText(String.format("%02d:%02d:%02d", clockHours, clockMinutes, clockSeconds));
-
-            // update date
-            // day = (day % 15) + 1; // increment day, and reset to 1 after 15 days
-            // if (day == 1) {
-            //     monthIndex = (monthIndex + 1) % 4; // increment month, and reset to 0 after 4 months
-            //     if (monthIndex == 0) {
-            //         year++; // increment year after 4 months
-            //     }
-            // }
             dateText.setText(months[monthIndex] + " " + day + ", " + year);
-            System.out.println(dateText);
+            System.out.println(dateText.getText());
         });
 
         timeline.getKeyFrames().add(keyFrame);
