@@ -14,6 +14,8 @@ public class FastClock {
     private Text dateText;
     private Timeline timeline;
     private int clockSeconds = 0; // added a variable to keep track of clock seconds
+    private int clockMinutes = 0;
+    private int clockHours = 0;
     private int day = 1; // added a variable to keep track of day
     private int year = 4122; // added a variable to keep track of year
     private String[] months = {"Aprimay", "Jugust", "Septober", "Decembary"}; // custom months
@@ -71,22 +73,30 @@ public class FastClock {
         timeline = new Timeline();
         timeline.setCycleCount(Animation.INDEFINITE);
 
-        KeyFrame keyFrame = new KeyFrame(Duration.seconds(.5), e -> {
-            clockSeconds = (clockSeconds + 10) % 300; // increment clock seconds by 10, and reset to 0 after 5 minutes
-            int minutes = clockSeconds / 60;
-            int hours = minutes % 60;
+        KeyFrame keyFrame = new KeyFrame(Duration.seconds(.1), e -> {
+            // clockSeconds = (clockSeconds + 10) % 300; // increment clock seconds by 10, and reset to 0 after 5 minutes
+            clockMinutes = clockMinutes+10;
+            if (clockMinutes == 60){
+                clockHours =clockHours +1;
+                clockMinutes=0;
+            }
+            if (clockHours==24){
+                day= day+1;
+                clockHours=0;
+            }
 
-            timeText.setText(String.format("%02d:%02d", hours, minutes));
+            timeText.setText(String.format("%02d:%02d:%02d", clockHours, clockMinutes, clockSeconds));
 
             // update date
-            day = (day % 15) + 1; // increment day, and reset to 1 after 15 days
-            if (day == 1) {
-                monthIndex = (monthIndex + 1) % 4; // increment month, and reset to 0 after 4 months
-                if (monthIndex == 0) {
-                    year++; // increment year after 4 months
-                }
-            }
+            // day = (day % 15) + 1; // increment day, and reset to 1 after 15 days
+            // if (day == 1) {
+            //     monthIndex = (monthIndex + 1) % 4; // increment month, and reset to 0 after 4 months
+            //     if (monthIndex == 0) {
+            //         year++; // increment year after 4 months
+            //     }
+            // }
             dateText.setText(months[monthIndex] + " " + day + ", " + year);
+            System.out.println(dateText);
         });
 
         timeline.getKeyFrames().add(keyFrame);
