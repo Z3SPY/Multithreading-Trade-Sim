@@ -126,6 +126,7 @@ public class mainpageTest extends Application {
 
     //#region MAIN SCENE FRONTEND
     public Scene createMainScene() {
+        FastClock fastClock = new FastClock();
         GridPane grid = new GridPane();
         grid.setHgap(10); // Horizontal gap between columns
         grid.setVgap(10); // Vertical gap between rows
@@ -325,11 +326,13 @@ public class mainpageTest extends Application {
 
         // Create a Month
         Label monthText = new Label("Apr");
+        monthText.setText(fastClock.getCurrentMonth());
         monthText.setStyle("-fx-text-fill: #DC5F00; -fx-font-size: 20;");
 
 
         // Create the bottom section with two numbers
         Label dayText = new Label("7");
+        dayText.setText(fastClock.getCurrentDay());
         dayText.setStyle("-fx-text-fill: #FFFFFF; -fx-font-size: 20;"); 
 
         // Create the middle section with a dark gray rectangle
@@ -344,6 +347,7 @@ public class mainpageTest extends Application {
         middleRect2.setStyle("-fx-background-color: #555555;"); // Dark gray color
 
         Label yearText = new Label("4122");
+        yearText.setText(fastClock.getCurrentYear());
         yearText.setStyle("-fx-text-fill: #DC5F00; -fx-font-size: 20;"); // Orange color
 
         HBox bottomSection = new HBox(2); // Horizontal box with spacing
@@ -367,14 +371,12 @@ public class mainpageTest extends Application {
         
         //#region TimePane
         StackPane timePane = new StackPane();
-        FastClock fastClock = new FastClock();
-
 
         // Label timeText = new Label("23:00:00");
         // timeText.setStyle("-fx-text-fill: #DC5F00;"); // Set text color
 
         // timePane.getChildren().addAll(timeText);
-        timePane.getChildren().add(fastClock);
+        timePane.getChildren().add(fastClock.getTimePane());
         timePane.setTranslateX(10);
 
         GridPane.setHgrow(timePane, Priority.NEVER);
