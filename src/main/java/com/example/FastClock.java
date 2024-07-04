@@ -49,8 +49,9 @@ public class FastClock {
         timePane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
         timeText = new Text("00:00");
-        timeText.setFill(Color.WHITE);
-        timeText.setFont(Font.font("Arial", 24));
+        timeText.setFill(Color.web("#DC5F00"));
+        timeText.setFont(Font.font("Arial", 35));
+        
 
         timePane.getChildren().add(timeText);
         return timePane;
