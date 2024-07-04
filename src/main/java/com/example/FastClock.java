@@ -29,28 +29,12 @@ public class FastClock {
     private int monthIndex = 0; // current month index
 
     public FastClock() {
-        initClock();
         startClock();
-    }
-
-    private void initClock() {
-        StackPane clockarea = new StackPane();
-        clockarea.setMinSize(60, 25);
-        clockarea.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-
-        timeText = new Text("00:00");
-        timeText.setFill(Color.WHITE);
-        timeText.setFont(Font.font("Arial", 24));
-
-        dateText = new Text("Aprimay 1, 4122");
-        dateText.setFill(Color.WHITE);
-        dateText.setFont(Font.font("Arial", 24));
     }
 
     public StackPane getTimePane() {
         StackPane timePane = new StackPane();
-        timePane.setMinSize(25, 25);
-        timePane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+    
 
         timeText = new Text("00:00");
         timeText.setFill(Color.web("#DC5F00"));
@@ -103,8 +87,8 @@ public class FastClock {
         timeline = new Timeline();
         timeline.setCycleCount(Animation.INDEFINITE);
 
-        KeyFrame keyFrame = new KeyFrame(Duration.seconds(10), e -> {
-            clockMinutes = clockMinutes+5;
+        KeyFrame keyFrame = new KeyFrame(Duration.seconds(.1), e -> {
+            clockMinutes = clockMinutes+30;
             if (clockMinutes == 60) {
                 clockHours++;
                 clockMinutes = 0;
@@ -123,7 +107,6 @@ public class FastClock {
             }
 
             timeText.setText(String.format("%02d:%02d:%02d", clockHours, clockMinutes, clockSeconds));
-            dateText.setText(months[monthIndex] + " " + day + ", " + year);
             monthText.setText(months[monthIndex]);
             dayText.setText(String.valueOf(day));
             yearText.setText(String.valueOf(year));
