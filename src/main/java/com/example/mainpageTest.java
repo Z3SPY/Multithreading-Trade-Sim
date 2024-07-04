@@ -306,8 +306,6 @@ public class mainpageTest extends Application {
 
         //#region Date
         StackPane datePane = new StackPane();
-
-        
         datePane.getStyleClass().add("mainpage-cellStyle");
         GridPane.setHgrow(datePane, Priority.NEVER);
         GridPane.setVgrow(datePane, Priority.NEVER);
@@ -318,7 +316,7 @@ public class mainpageTest extends Application {
         GridPane dateGrid = new GridPane();
 
 
-        Label topRect1 = new Label("   -{  Month   / Day  / Year }-");
+        Label topRect1 = new Label("   -{  Month   /      Day   /   Year }-");
         topRect1.setStyle("-fx-text-fill: #DC5F00; -fx-font-size: 12px;"); // Orange color
         topRect1.setTranslateY(3);
 
@@ -326,40 +324,10 @@ public class mainpageTest extends Application {
         VBox topSection = new VBox(1); 
         topSection.getChildren().addAll(topRect1);
 
-        // Create a Month
-        Label monthText = new Label("Apr");
-        monthText.setText(fastClock.getCurrentMonth());
-        monthText.setStyle("-fx-text-fill: #DC5F00; -fx-font-size: 20;");
-
-
-        // Create the bottom section with two numbers
-        Label dayText = new Label("7");
-        dayText.setText(fastClock.getCurrentDay());
-        dayText.setStyle("-fx-text-fill: #FFFFFF; -fx-font-size: 20;"); 
-
-        // Create the middle section with a dark gray rectangle
-        Region middleRect = new Region();
-        middleRect.setMinSize(10, 3);
-        middleRect.setMaxSize(10, 3);
-        middleRect.setStyle("-fx-background-color: #555555;"); // Dark gray color
-
-        Region middleRect2 = new Region();
-        middleRect2.setMinSize(10, 3);
-        middleRect2.setMaxSize(10, 3);
-        middleRect2.setStyle("-fx-background-color: #555555;"); // Dark gray color
-
-        Label yearText = new Label("4122");
-        yearText.setText(fastClock.getCurrentYear());
-        yearText.setStyle("-fx-text-fill: #DC5F00; -fx-font-size: 20;"); // Orange color
-
-        HBox bottomSection = new HBox(2); // Horizontal box with spacing
-        bottomSection.getChildren().addAll(monthText, middleRect,dayText, middleRect2, yearText);
-        bottomSection.setAlignment(Pos.CENTER);
-
         // Add sections to the GridPane
         dateGrid.setAlignment(Pos.CENTER);
         dateGrid.add(topSection, 0, 0);
-        dateGrid.add(bottomSection, 0, 1);
+        dateGrid.add(fastClock.getDatePane(), 0, 1);
 
         // Center the GridPane in the StackPane
         StackPane.setAlignment(dateGrid, Pos.CENTER);

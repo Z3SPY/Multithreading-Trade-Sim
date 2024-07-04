@@ -3,6 +3,10 @@ package com.example;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.geometry.Pos;
+import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -12,6 +16,9 @@ import javafx.util.Duration;
 public class FastClock {
     private Text timeText;
     private Text dateText;
+    private Label monthText = new Label("Apr");
+    private Label dayText = new Label("7");
+    private Label yearText = new Label("4122");
     private Timeline timeline;
     private int clockSeconds = 0; 
     private int clockMinutes = 0;
@@ -61,11 +68,34 @@ public class FastClock {
         datePane.setMinSize(25, 25);
         datePane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
-        dateText = new Text("Aprimay 1, 4122"); // initial date
-        dateText.setFill(Color.WHITE);
-        dateText.setFont(Font.font("Arial", 24));
+        // Create a Month
+        monthText.setText(getCurrentMonth());
+        monthText.setStyle("-fx-text-fill: #DC5F00; -fx-font-size: 20;");
 
-        datePane.getChildren().add(dateText);
+        // Create a Day
+        dayText.setText(getCurrentDay());
+        dayText.setStyle("-fx-text-fill: #FFFFFF; -fx-font-size: 20;"); 
+
+        // Create the middle section with a dark gray rectangle
+        Region middleRect = new Region();
+        middleRect.setMinSize(10, 3);
+        middleRect.setMaxSize(10, 3);
+        middleRect.setStyle("-fx-background-color: #555555;"); // Dark gray color
+        // Create the middle section with a dark gray rectangle
+        Region middleRect2 = new Region();
+        middleRect2.setMinSize(10, 3);
+        middleRect2.setMaxSize(10, 3);
+        middleRect2.setStyle("-fx-background-color: #555555;"); // Dark gray color
+
+        // Create a Year
+        yearText.setText(getCurrentYear());
+        yearText.setStyle("-fx-text-fill: #DC5F00; -fx-font-size: 20;"); // Orange color
+
+        HBox bottomSection = new HBox(2); // Horizontal box with spacing
+        bottomSection.getChildren().addAll(monthText, middleRect,dayText, middleRect2, yearText);
+        bottomSection.setAlignment(Pos.CENTER);
+
+        datePane.getChildren().addAll(bottomSection);
         return datePane;
     }
 
@@ -73,8 +103,8 @@ public class FastClock {
         timeline = new Timeline();
         timeline.setCycleCount(Animation.INDEFINITE);
 
-        KeyFrame keyFrame = new KeyFrame(Duration.seconds(.1), e -> {
-            clockMinutes = clockMinutes+30;
+        KeyFrame keyFrame = new KeyFrame(Duration.seconds(10), e -> {
+            clockMinutes = clockMinutes+5;
             if (clockMinutes == 60) {
                 clockHours++;
                 clockMinutes = 0;
@@ -94,7 +124,9 @@ public class FastClock {
 
             timeText.setText(String.format("%02d:%02d:%02d", clockHours, clockMinutes, clockSeconds));
             dateText.setText(months[monthIndex] + " " + day + ", " + year);
-            System.out.println(dateText.getText());
+            monthText.setText(months[monthIndex]);
+            dayText.setText(String.valueOf(day));
+            yearText.setText(String.valueOf(year));
         });
 
         timeline.getKeyFrames().add(keyFrame);
