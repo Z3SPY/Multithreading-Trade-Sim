@@ -5,6 +5,8 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
@@ -24,6 +26,9 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import py4j.GatewayServer;
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
+import java.lang.reflect.Type;
 import java.io.File;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,10 +38,12 @@ import java.util.List;
 import java.util.Map;
 
 public class mainpageTest extends Application {
-
+    private static GatewayServer gatewayServer = null;
     public static JavaFXLineGraph lineGraphRef;
     public static StackPane lineGraphStackPane;
+    public static Label balanceLabel;
     public static String curStockName;
+    public static Float balance;
 
     Label priceLabelOutput; 
     Label ctgrLabelOutput;
@@ -53,6 +60,8 @@ public class mainpageTest extends Application {
         mainpageTest.objProfileInstance = profileInstance;
         this.curAccount = profileInstance.getProfileData();
         System.out.println(this.curAccount.get("name"));   
+        System.out.println(this.curAccount.get("stocks"));   
+
     }
     
 
@@ -70,9 +79,9 @@ public class mainpageTest extends Application {
 
 
 
-        System.out.println("Notify " + listeners);
         for (ProfileInterface listener : listeners) {
             System.out.println(this.curAccount);
+            System.out.println("Notify ");
 
         
             //Create a Json to send
@@ -80,9 +89,52 @@ public class mainpageTest extends Application {
             String json = gson.toJson(this.curAccount); 
         
 
+            // BUYING AND SELLING HAPPENS IN THIS ONE LINE
             Object returnValue = listener.notify(this, json, btnState, Integer.parseInt(qtyInput), stockName);
             System.out.println(returnValue);
+
+            System.out.println(returnValue);
+
+
+            if (returnValue != null) {
+
+                try {
+                    // Parse the JSON string into the ReturnData object
+                    String jsonString = (String) returnValue;
+                    ReturnData returnData = gson.fromJson(jsonString, ReturnData.class);
+
+                    // Access the parsed data
+                    Map<String, Float> portfolio = returnData.getPortfolio();
+                    double balance = returnData.getBalance();
+
+                    // Print the values
+                    System.out.println("Portfolio: " + portfolio);
+                    System.out.println("Balance: " + balance);
+
+                    // Example usage: updating curAccount with new data if necessary
+                    mainpageTest.objProfileInstance.updateProfileData((float) balance, portfolio);
+                    updateWalletBalance((float) balance);
+                    this.curAccount = mainpageTest.objProfileInstance.getProfileData();
+
+                } catch (JsonSyntaxException e) {
+                    e.printStackTrace();
+                }
+             
+          
+                
+            
+                
+            }
+            
+
+
+
         }
+    }
+
+    public void updateWalletBalance(float newBal) {
+        balance =  newBal;
+        balanceLabel.setText("BALANCE: " + balance);
     }
 
    
@@ -92,6 +144,7 @@ public class mainpageTest extends Application {
     public void start(Stage mainStage) {
         createGateWayServer(); // Creates a gateway for python to send data
 
+        balance = (Float) this.curAccount.get("balance");
 
         lineGraphRef = new JavaFXLineGraph();
         lineGraphStackPane = lineGraphRef.createStackPane();
@@ -129,7 +182,7 @@ public class mainpageTest extends Application {
         
 
 
-        Scene mainScene = createMainScene();
+        Scene mainScene = createMainScene(mainStage);
         mainScene.getStylesheets().add(this.getClass().getResource("chart.css").toExternalForm());
         
         mainStage.setTitle("ISTO SYSTEM");
@@ -141,7 +194,7 @@ public class mainpageTest extends Application {
     
 
     //#region MAIN SCENE FRONTEND
-    public Scene createMainScene() {
+    public Scene createMainScene(Stage mainStage) {
         GridPane grid = new GridPane();
         grid.setHgap(10); // Horizontal gap between columns
         grid.setVgap(10); // Vertical gap between rows
@@ -431,14 +484,14 @@ public class mainpageTest extends Application {
         titleLabel.setTextFill(Color.WHITE);
         titleLabel.setFont(Font.font("Arial", 28)); // Adjust font and size as needed
         // Create the Balance label
-        Label balanceLabel = new Label("BALANCE: 25.10 K SHK");
+        balanceLabel = new Label("BALANCE: " + balance); // Chagne Balance
         balanceLabel.setTranslateX(25);
         balanceLabel.setTranslateY(5);
         balanceLabel.setTextFill(Color.WHITE);
         balanceLabel.setFont(Font.font("Arial", 20)); // Adjust font and size as needed
 
         // Create the Cp ID label
-        Label cpIdLabel = new Label("Cp ID: 211934-455");
+        Label cpIdLabel = new Label("Cp ID: " + this.curAccount.get("companyID")); 
         cpIdLabel.setTranslateX(55);
         cpIdLabel.setTranslateY(0);
         cpIdLabel.setTextFill(Color.BLACK);
@@ -693,6 +746,10 @@ public class mainpageTest extends Application {
                     notifyAllListeners(inputField.getText(), true, curStockName); //Sends the event listener to python...
                     // Add your sell functionality here
                 }
+            } 
+            
+            if (subTitleTradeDet.getText() == "" || inputField.getText() == "") {
+                showAlert(AlertType.ERROR, "Transaction", "Missing Quantity or Havent Selected Stock.");
             }
         });
 
@@ -818,9 +875,36 @@ public class mainpageTest extends Application {
 
         infoPane.getChildren().addAll(infoGridPane);
 
+
         //BOTTOM RIGHT VIS PANE END 
         //#endregion
         
+
+        //#region logout
+        Button logoutButton = new Button("Logout");
+        logoutButton.getStyleClass().add("logout-btn");
+        logoutButton.setMaxWidth(Double.MAX_VALUE);
+        logoutButton.setTranslateX(40);
+        logoutButton.setOnAction(e -> {
+            try {
+                this.curAccount = null;
+                login loginPage = new login();
+                loginPage.start(mainStage);
+
+
+                //Saves Profile Changes
+                if (mainpageTest.objProfileInstance != null){
+                    mainpageTest.objProfileInstance.updateDataBase();
+                }
+                
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        });
+
+        HBox logoutPane = new HBox(logoutButton);
+        grid.add(logoutPane, 5, 0, 1, 1);
+        ////#endregion
 
 
         //#region BUTTON CLICK INTERACTIONS
@@ -927,9 +1011,24 @@ public class mainpageTest extends Application {
 
             
             // Create colored content for profileButton
-           StackPane profileContent = new StackPane();
+            StackPane profileContent = new StackPane();
             profileContent.setStyle("-fx-background-color: #1E1E1E;"); // Set background color
             
+
+
+
+
+
+
+            // 
+
+
+
+
+
+
+
+
 
             GridPane profileContentGrid = new GridPane();
             profileContentGrid.setVgap(5);
@@ -1007,6 +1106,8 @@ public class mainpageTest extends Application {
         //#endregion
         
 
+        
+
         Scene scene = new Scene(grid, 900, 750);
         scene.setCamera(new PerspectiveCamera());
         scene.getStylesheets().add(getClass().getResource("/com/example/styles.css").toExternalForm());
@@ -1015,12 +1116,22 @@ public class mainpageTest extends Application {
     }
     //#endregion
 
+    private void showAlert(AlertType alertType, String title, String message) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
 
-    //#region Python 
+      //#region Python 
     public static void createGateWayServer() {
         System.out.println("GateWay Server Connected");
-        GatewayServer gatewayServer = new GatewayServer(new mainpageTest(objProfileInstance));
-        gatewayServer.start();
+
+        if (gatewayServer == null) {
+            gatewayServer = new GatewayServer(new mainpageTest(objProfileInstance));
+            gatewayServer.start();
+        }
+        
     }
 
     @Override

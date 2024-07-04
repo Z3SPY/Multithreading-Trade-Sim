@@ -22,6 +22,13 @@ class Player:
 
     def getBal(self):
         return self.cash_balance
+    
+    def getPort(self):
+        return self.portfolio
+    
+    def getName(self):
+        return self.name
+    
 
     def updateStockList(self, newPortfolio):
         self.portfolio = newPortfolio
@@ -45,6 +52,7 @@ class Player:
     def buy_stock(self, stock, quantity):
         total_cost = stock.stockPrice * quantity
         if self.cash_balance >= total_cost:
+            print(self.name + " bought "  + stock.stockName  +" stock")
             # Deduct transaction cost
             transaction_fee = total_cost * self.transaction_cost
             total_cost += transaction_fee
@@ -241,25 +249,30 @@ class ProfileEntryPoint:
             if stock.stockName == stock_name:
                 print("Stock Found")
                 return stock
-            return None
+        print("Stock Not Found")
+        return None
 
     def notify(self, obj, jsonData, btnState, qty, stockName):
 
         print("Notified Python", jsonData)
         try:
             loaded = json.loads(jsonData)
-            print(loaded)
 
-            if self.profileName is None:
+            if self.profileName is None or self.profileName != loaded["name"]:
                 self.profileName = loaded["name"]
                 self.profileBal = loaded["balance"]
                 self.profileList = loaded["stocks"]
                 print("This is your profile instance, " , self.profileName )
                 print("This is your profile stock, " , self.profileList)
                 print("This is your profile balance, " , self.profileBal)
+            elif self.profileName is not None and self.profileName == loaded["name"]:
+                self.profileName = self.player_profile.getName()
+                self.profileBal = self.player_profile.getBal()
+                self.profileList = self.player_profile.getPort()
 
 
-            if self.player_profile is None:
+            # Checks if player is still same player or if player doesnt exist
+            if self.player_profile is None or self.player_profile.getName() != loaded["name"] :
                 self.instantiateProfile(self.profileName, self.profileBal, self.profileList)
             
 
@@ -270,13 +283,17 @@ class ProfileEntryPoint:
                     self.player_profile.sell_stock(self.search_stock(stockName), qty)
                 elif btnState == False: #buy
                     print(self.player_profile.cash_balance)
+                    
+                    self.player_profile.buy_stock(self.search_stock(stockName), qty)
                     print("Buy")
-                    print("Current Profile: ", self.player_profile.name)
-                    print("Added To Profile Portfolio: ", self.player_profile.portfolio)
+                    print("Current Profile: ", self.player_profile.getName())
+                    print("Added To Profile Portfolio: ", self.player_profile.getPort())
                     print("Current Balance: ", self.player_profile.getBal())
 
-                    self.player_profile.buy_stock(self.search_stock(stockName), qty)
-
+                return_data = {
+                    "portfolio": self.player_profile.getPort(),
+                    "balance": self.player_profile.getBal()
+                }
 
         except json.JSONDecodeError as e:
             print(f"Error parsing JSON: {e}")
@@ -288,16 +305,14 @@ class ProfileEntryPoint:
         with self.condition:
             self.event_triggered = True
             self.condition.notify()
-        return "A Return Value"
+        return json.dumps(return_data)
     
     def instantiateProfile(self, name, bal, stock):
-        if self.player_profile is None:
-            self.player_profile = Player(name, bal)
-            self.player_profile.updateStockList(stock)
-
-            print(f"Created new profile for {name} with amount {bal}")
-        else:
-            print("Profile already exists")
+        self.player_profile = Player(name, bal)
+        self.player_profile.updateStockList(stock) # Get Stock from db
+        print(f"Created new profile for {name} with amount {bal}")
+        print("Profile already exists")
+        print(self.player_profile.getName())
 
         return self.player_profile
 
@@ -342,6 +357,9 @@ def main():
     
     stop_flag = False
     
+    #Initial 
+    event_system.passStockData(space_nasdaq, java_gateway)
+
     while not stop_flag:
         for stock in space_nasdaq:
             stock.simulate_stock_price(stock.stockPrice)

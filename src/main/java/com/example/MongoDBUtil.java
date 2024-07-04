@@ -9,7 +9,9 @@ import com.mongodb.client.model.Filters;
 
 import javafx.scene.chart.PieChart.Data;
 
-import java.util.ArrayList; 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 public class MongoDBUtil {
@@ -47,7 +49,7 @@ public class MongoDBUtil {
                 .append("username", username)
                 .append("password", password)
                 .append("companyId", companyId)
-                .append("stock", new ArrayList<DataObject>())
+                .append("stocks", new HashMap<String, Float>())
                 .append("balance", 1000f);
         collection.insertOne(newUser);
         return true;
@@ -63,9 +65,15 @@ public class MongoDBUtil {
         return company != null;
     }
 
-    public void updateStock(Object list, String username) {
+    public void updateStock(Map<String, Float> list, String username) {
         Document filter = new Document("username", username);
-        Document update = new Document("$set", new Document("stock", list));
+        Document update = new Document("$set", new Document("stocks", list));
+        collection.updateOne(filter, update);
+    }
+
+    public void updateBal(Float bal, String username) {
+        Document filter = new Document("username", username);
+        Document update = new Document("$set", new Document("balance", bal));
         collection.updateOne(filter, update);
     }
 

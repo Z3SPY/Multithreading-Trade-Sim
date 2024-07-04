@@ -163,3 +163,27 @@
     -fx-border-color: #504719;
     -fx-border-width: 2;
 }
+
+
+.dialog-pane {
+    -fx-background-color: #2c3e50;
+    -fx-text-fill: white;
+}
+
+.dialog-pane .button {
+    -fx-background-color: #3498db;
+    -fx-text-fill: white;
+}
+
+.dialog-pane .content.label {
+    -fx-text-fill: white;
+}
+
+.logout-btn {
+    -fx-padding: 1px 25px;
+    -fx-background-color: #DC5F00;
+    -fx-border-color: #DC5F00;
+    -fx-border-width: 7;
+    -fx-text-fill: #1E1E1E;
+    -fx-font-size: 15px;
+}

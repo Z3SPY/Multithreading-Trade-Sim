@@ -1,5 +1,7 @@
 package com.example;
 
+import java.util.Map;
+
 import org.bson.Document;
 
 import javafx.application.Application;
@@ -61,7 +63,7 @@ public class login extends Application {
             Document user = mongoDBUtil.validateUser(username, password);
             if (user!= null) {
                 Profile profileInstance = new Profile(user.getString("username"), user.getString("companyId"), 
-                                            user.get("stock"), Float.parseFloat(user.get("balance").toString()));
+                                            (Map<String, Float>) user.get("stocks"), Float.parseFloat(user.get("balance").toString()));
                 
                 showAlert(AlertType.INFORMATION, "Login Successful", "Welcome, " + username + "!");
                 System.out.println("login success");
