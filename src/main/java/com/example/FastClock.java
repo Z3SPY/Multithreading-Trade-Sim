@@ -87,8 +87,8 @@ public class FastClock {
         timeline = new Timeline();
         timeline.setCycleCount(Animation.INDEFINITE);
 
-        KeyFrame keyFrame = new KeyFrame(Duration.seconds(.1), e -> {
-            clockMinutes = clockMinutes+30;
+        KeyFrame keyFrame = new KeyFrame(Duration.seconds(10), e -> {
+            clockMinutes = clockMinutes+5;
             if (clockMinutes == 60) {
                 clockHours++;
                 clockMinutes = 0;

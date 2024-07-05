@@ -9,6 +9,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.BorderStroke;
@@ -51,6 +52,17 @@ public class register {
         TextField companyIDField = new TextField();
         companyIDField.setPromptText("company ID");
         companyIDField.getStyleClass().add("userField"); // Apply CSS class for styling
+
+        // Limit company ID to 4 digits
+        TextFormatter<Integer> formatter = new TextFormatter<>(change -> {
+            String newText = change.getControlNewText();
+            if (newText.matches("\\d*") && newText.length() <= 4) {
+                return change;
+            } else {
+                return null;
+            }
+        });
+companyIDField.setTextFormatter(formatter);
 
         // Create the register button
         Button registerButton = new Button("SIGN UP");
