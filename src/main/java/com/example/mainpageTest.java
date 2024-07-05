@@ -429,8 +429,8 @@ public class mainpageTest extends Application {
 
         GridPane.setHgrow(timePane, Priority.NEVER);
         GridPane.setVgrow(timePane, Priority.NEVER);
-        timePane.setMinSize(25, 25);
-        timePane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        timePane.setMinSize(126, 25);
+        timePane.setMaxSize(126, Double.MAX_VALUE);
 
         timePane.getStyleClass().addAll("time");
 

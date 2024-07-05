@@ -15,7 +15,6 @@ import javafx.util.Duration;
 
 public class FastClock {
     private Text timeText;
-    private Text dateText;
     private Label monthText = new Label("Apr");
     private Label dayText = new Label("7");
     private Label yearText = new Label("4122");
@@ -39,9 +38,6 @@ public class FastClock {
         timeText = new Text("00:00:00");
         timeText.setFill(Color.web("#DC5F00"));
         timeText.setFont(Font.font("Arial", 35));
-        timePane.setMinSize(25, 25);
-        timePane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        
 
         timePane.getChildren().add(timeText);
         return timePane;
