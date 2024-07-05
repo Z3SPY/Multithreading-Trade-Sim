@@ -1,14 +1,22 @@
 package com.example;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+
 import javafx.application.Application;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -25,17 +33,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import py4j.GatewayServer;
-import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
-import com.google.gson.reflect.TypeToken;
-import java.lang.reflect.Type;
-import java.io.File;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class mainpageTest extends Application {
     private static GatewayServer gatewayServer = null;
@@ -195,6 +192,7 @@ public class mainpageTest extends Application {
 
     //#region MAIN SCENE FRONTEND
     public Scene createMainScene(Stage mainStage) {
+        FastClock fastClock = new FastClock();
         GridPane grid = new GridPane();
         grid.setHgap(10); // Horizontal gap between columns
         grid.setVgap(10); // Vertical gap between rows
@@ -354,9 +352,9 @@ public class mainpageTest extends Application {
         ColumnConstraints lowMidGridCol0 = new ColumnConstraints();
         lowMidGridCol0.setPercentWidth(32);
         ColumnConstraints lowMidGridCol1 = new ColumnConstraints();
-        lowMidGridCol1.setPercentWidth(23.8);
+        lowMidGridCol1.setPercentWidth(30);
         ColumnConstraints lowMidGridCol2 = new ColumnConstraints();
-        lowMidGridCol2.setPercentWidth(44.2);
+        lowMidGridCol2.setPercentWidth(40);
 
         RowConstraints lowMidGridRow0 = new RowConstraints();
         lowMidGridRow0.setPercentHeight(100); 
@@ -391,7 +389,7 @@ public class mainpageTest extends Application {
         GridPane dateGrid = new GridPane();
 
 
-        Label topRect1 = new Label("-{ Month / Day / Year }-");
+        Label topRect1 = new Label("   -{  Month   /      Day   /   Year }-");
         topRect1.setStyle("-fx-text-fill: #DC5F00; -fx-font-size: 12px;"); // Orange color
         topRect1.setTranslateY(3);
 
@@ -399,37 +397,10 @@ public class mainpageTest extends Application {
         VBox topSection = new VBox(1); 
         topSection.getChildren().addAll(topRect1);
 
-        // Create a Month
-        Label monthText = new Label("Apr");
-        monthText.setStyle("-fx-text-fill: #DC5F00; -fx-font-size: 20;");
-
-
-        // Create the bottom section with two numbers
-        Label dayText = new Label("7");
-        dayText.setStyle("-fx-text-fill: #FFFFFF; -fx-font-size: 20;"); 
-
-        // Create the middle section with a dark gray rectangle
-        Region middleRect = new Region();
-        middleRect.setMinSize(10, 3);
-        middleRect.setMaxSize(10, 3);
-        middleRect.setStyle("-fx-background-color: #555555;"); // Dark gray color
-
-        Region middleRect2 = new Region();
-        middleRect2.setMinSize(10, 3);
-        middleRect2.setMaxSize(10, 3);
-        middleRect2.setStyle("-fx-background-color: #555555;"); // Dark gray color
-
-        Label yearText = new Label("4122");
-        yearText.setStyle("-fx-text-fill: #DC5F00; -fx-font-size: 20;"); // Orange color
-
-        HBox bottomSection = new HBox(2); // Horizontal box with spacing
-        bottomSection.getChildren().addAll(monthText, middleRect,dayText, middleRect2, yearText);
-        bottomSection.setAlignment(Pos.CENTER);
-
         // Add sections to the GridPane
         dateGrid.setAlignment(Pos.CENTER);
         dateGrid.add(topSection, 0, 0);
-        dateGrid.add(bottomSection, 0, 1);
+        dateGrid.add(fastClock.getDatePane(), 0, 1);
 
         // Center the GridPane in the StackPane
         StackPane.setAlignment(dateGrid, Pos.CENTER);
@@ -443,10 +414,8 @@ public class mainpageTest extends Application {
         
         //#region TimePane
         StackPane timePane = new StackPane();
-        Label timeText = new Label("23:00:00");
-        timeText.setStyle("-fx-text-fill: #DC5F00;"); // Set text color
 
-        timePane.getChildren().addAll(timeText);
+        timePane.getChildren().add(fastClock.getTimePane());
         timePane.setTranslateX(10);
 
         GridPane.setHgrow(timePane, Priority.NEVER);
