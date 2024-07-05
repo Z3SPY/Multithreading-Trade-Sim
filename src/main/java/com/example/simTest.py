@@ -107,7 +107,7 @@ class Player:
                 self.sell_stock(stock, quantity)
     
     def increase_uncertainty(self):
-        print(self.uncertainty)
+        #print(self.uncertainty)
 
         for stock_name in self.uncertainty:
             self.uncertainty[stock_name] += random.uniform(0.01, 0.1)

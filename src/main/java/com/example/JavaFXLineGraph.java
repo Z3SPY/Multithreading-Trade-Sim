@@ -2,6 +2,8 @@ package com.example;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -138,6 +140,27 @@ public class JavaFXLineGraph extends Application {
         return stackPane;
     }
 
+    public double getSpecificStockValue(String stockName) {
+        List<XYChart.Series<Number, Number>> seriesList = seriesManager.getSeriesList();
+        for (XYChart.Series<Number, Number> series : seriesList) {
+            String seriesName = series.getName();
+            String regex = "([^\\(]+)";
+            Pattern pattern = Pattern.compile(regex);
+            Matcher matcher = pattern.matcher(seriesName);
+            if (matcher.find()) {
+                String extractedStockName = matcher.group(1).trim();
+                if (extractedStockName.equals(stockName)) {
+                    ObservableList<XYChart.Data<Number, Number>> data = series.getData();
+                    if (!data.isEmpty()) {
+                        XYChart.Data<Number, Number> lastDataPoint = data.get(data.size() - 1);
+                        return lastDataPoint.getYValue().doubleValue();
+                    }
+                }
+            }
+        }
+        return 0d; // Return 0 if the stock is not found
+    }
+
     public void updateStockValue(String jsonData) {
         Platform.runLater(() -> {
             // Ensure seriesList is not null
@@ -178,7 +201,7 @@ public class JavaFXLineGraph extends Application {
 
     private void updateXAxisRange() {
         // Define the maximum range for the X-axis
-        int maxRange = 60;
+        int maxRange =40;
         //System.out.println(timeCounter);
         // Update the X-axis upper bound to ensure it stays within the range
         if (timeCounter > maxRange) {

@@ -11,6 +11,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
@@ -42,7 +43,15 @@ public class mainpageTest extends Application {
     public static String curStockName;
     public static Float balance;
 
-    Label priceLabelOutput; 
+    // Leaderboard
+    public static Label p1N;
+    public static Label p2N;
+    public static Label p3N;
+    public static Label p1S;
+    public static Label p2S;
+    public static Label p3S;
+
+    public static Label priceLabelOutput; 
     Label ctgrLabelOutput;
     Label subTitleTradeDet;
 
@@ -782,13 +791,14 @@ public class mainpageTest extends Application {
         leaderBoardTitle.getChildren().add(ldrTitle);
 
 
+
         StackPane plyr1Name = new StackPane();
         plyr1Name.setStyle("-fx-border-color: #1E1E1E; -fx-background-color:  #DC5F00; ");
-        Label p1N = new Label("JOSHUA");
+        p1N = new Label("JOSHUA");
         p1N.setStyle("-fx-text-color: #1E1E1E;");
         StackPane plyr1Status = new StackPane();
         plyr1Status.setStyle("-fx-border-color: #DC5F00;");
-        Label p1S = new Label("Active");
+        p1S = new Label("Active");
         p1S.setStyle("-fx-text-fill: #DC5F00");
 
         plyr1Name.getChildren().addAll(p1N);
@@ -796,11 +806,11 @@ public class mainpageTest extends Application {
 
         StackPane plyr2Name = new StackPane();
         plyr2Name.setStyle("-fx-border-color: #1E1E1E; -fx-background-color:  #DC5F00; ");
-        Label p2N = new Label("EMMA");
+        p2N = new Label("EMMA");
         p2N.setStyle("-fx-text-color: #1E1E1E;");
         StackPane plyr2Status = new StackPane();
         plyr2Status.setStyle("-fx-border-color: #DC5F00;");
-        Label p2S = new Label("Inactive");
+        p2S = new Label("Inactive");
         p2S.setStyle("-fx-text-fill: #DC5F00");
 
 
@@ -809,11 +819,11 @@ public class mainpageTest extends Application {
 
         StackPane plyr3Name = new StackPane();
         plyr3Name.setStyle("-fx-border-color: #1E1E1E; -fx-background-color:  #DC5F00; ");
-        Label p3N = new Label("LIAM");
+        p3N = new Label("LIAM");
         p3N.setStyle("-fx-text-color: #1E1E1E;");
         StackPane plyr3Status = new StackPane();
         plyr3Status.setStyle("-fx-border-color: #DC5F00;");
-        Label p3S = new Label("Active");
+        p3S = new Label("Active");
         p3S.setStyle("-fx-text-fill: #DC5F00");
 
 
@@ -1107,6 +1117,17 @@ public class mainpageTest extends Application {
     public void updateStockPane(String JSONdata) {
         System.out.println("Updating Stock Pane");
         lineGraphRef.updateStockValue(JSONdata);
+
+        Double curDouble = lineGraphRef.getSpecificStockValue(curStockName);
+        System.out.println(curDouble);
+        //Based on curStockName update:
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+
+                priceLabelOutput.setText(Double.toString((double) Math.round((curDouble * 10000)) / 10000));
+            }
+        });
     } 
 
     //#endregion
@@ -1115,7 +1136,38 @@ public class mainpageTest extends Application {
         Gson gson = new Gson();
         Object[] leaderboard = gson.fromJson(list, Object[].class);
         String json = gson.toJson(leaderboard);
-        System.out.println("Printing Leaderboard: " + json);
+        
+        for (int i = 0; i < 3; i++) {
+            Map<String, Object> map = (Map<String, Object>) leaderboard[i];
+            final String name = (String) map.get("name");
+            final double amount = (double) map.get("amount");
+            final double cashBalance = (double) map.get("cash_balance");
+            final double totalInvestment = (double) map.get("total_investment");
+            final int index = i; // Create a final variable
+
+            
+            System.out.println("Name: " + name);
+            System.out.println("Amount: " + amount);
+            System.out.println("Cash Balance: " + cashBalance);
+            System.out.println("Total Investment: " + totalInvestment);
+            System.out.println();
+
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    if (index == 0) {
+                        p1N.setText(name);
+                        p1S.setText(Double.toString(cashBalance));
+                    } else if (index == 1) {
+                        p2N.setText(name);
+                        p2S.setText(Double.toString(cashBalance));
+                    } else if (index == 2) {
+                        p3N.setText(name);
+                        p3S.setText(Double.toString(cashBalance));
+                    }
+                }
+            });
+        }
     }
 
 
