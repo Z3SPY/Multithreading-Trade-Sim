@@ -18,7 +18,7 @@
 
 .chart-legend-item-symbol {
     -fx-background-insets: 0, 1;
-    -fx-background-radius: 40px;
+    -fx-background-radius: 10px;
 }
 
 .chart-legend-item {
@@ -27,7 +27,7 @@
 
 .chart-plot-background {
     -fx-stroke: #DC5F00;
-    -fx-stroke-width: 10px;
+    -fx-stroke-width: 5px;
     -fx-padding: 0;
     -fx-border-insets: 0;
     -fx-background-insets: 0;
