@@ -1004,9 +1004,9 @@ public class mainpageTest extends Application {
             profileContentGrid.setVgap(5);
 
             ColumnConstraints profileContentGridCol0 = new ColumnConstraints();
-            profileContentGridCol0.setPercentWidth(50);
+            profileContentGridCol0.setPercentWidth(40);
             ColumnConstraints profileContentGridCol1 = new ColumnConstraints();
-            profileContentGridCol1.setPercentWidth(50);
+            profileContentGridCol1.setPercentWidth(60);
 
             profileContentGrid.getColumnConstraints().addAll(profileContentGridCol0, profileContentGridCol1);
 
@@ -1019,8 +1019,8 @@ public class mainpageTest extends Application {
 
             
             ImageView profilePicture = new ImageView();
-            profilePicture.setFitWidth(150);
-            profilePicture.setFitHeight(150);
+            profilePicture.setFitWidth(180);
+            profilePicture.setFitHeight(180);
             profilePicture.setImage(new Image(new File("src/main/java/com/example/profile_picture.png").toURI().toString()));
 
 
@@ -1032,25 +1032,41 @@ public class mainpageTest extends Application {
 
             // Username
             Label usernameLabel = new Label((String)this.curAccount.get("name"));
-            usernameLabel.setStyle("-fx-text-fill: #FFFFFF; -fx-font-size: 24;"); // White text, size 24
+            usernameLabel.setStyle("-fx-text-fill: #DC5F00; -fx-font-size: 40;"); // Set text color
 
             // Company ID
             Label companyIdLabel = new Label("Company ID: " + (String)this.curAccount.get("companyID"));
             companyIdLabel.setStyle("-fx-text-fill: #FFFFFF; -fx-font-size: 18;"); // White text, size 18
-            companyIdLabel.setTranslateY(20);
+            
+            // Total Investment
+            Label userInvestment = new Label("Investment Total: [placeholder]");
+            userInvestment.setStyle("-fx-text-fill: #FFFFFF; -fx-font-size: 18;"); // White text, size 18
+
+            // Current Account Cash
+            Label userCurrentCash = new Label("Current Account Cash: "+ balance);
+            userCurrentCash.setStyle("-fx-text-fill: #FFFFFF; -fx-font-size: 18;"); // White text, size 18
+
+            System.out.println(userCurrentCash);
 
 
-            StackPane profDetStackPane = new StackPane();
-            profDetStackPane.getChildren().addAll(companyIdLabel,usernameLabel);
+            GridPane profileDetailsGrid = new GridPane();
+            profileDetailsGrid.setVgap(2);
+            profileDetailsGrid.add(usernameLabel, 0, 0);
+            profileDetailsGrid.add(companyIdLabel, 0, 1);
+            profileDetailsGrid.add(userInvestment, 0, 2);
+            profileDetailsGrid.add(userCurrentCash, 0, 3);
+
+            // StackPane profDetStackPane = new StackPane();
+            // profDetStackPane.getChildren().addAll(companyIdLabel,usernameLabel);
 
             // profDetStackPane.setStyle("-fx-background-color: yellow;");
 
             StackPane profListStackPane = new StackPane();
-            // profListStackPane.setStyle("-fx-background-color: green;");
+            profListStackPane.setStyle("-fx-background-color: green;");
 
 
             profileContentGrid.add(profStackPane, 0, 0);
-            profileContentGrid.add(profDetStackPane, 1, 0);
+            profileContentGrid.add(profileDetailsGrid, 1, 0);
             profileContentGrid.add(profListStackPane, 0, 1, 2, 1);
 
 
