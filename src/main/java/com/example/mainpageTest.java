@@ -14,6 +14,8 @@ import javafx.animation.Timeline;
 import javafx.animation.TranslateTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
@@ -63,6 +65,9 @@ public class mainpageTest extends Application {
 
     private TextField inputField;
     public static FastClock fastClock;
+
+
+    public static ListView<String> stocksListView;
 
 
     public Map<String, Object> curAccount;
@@ -156,6 +161,15 @@ public class mainpageTest extends Application {
         balance = newBal.floatValue();
         balanceLabel.setText(String.format("BALANCE: %.2f $HK", balance));
     }
+
+
+
+    private String[] formatStocks(Map<String, Float> stocks) {
+        return stocks.entrySet().stream()
+                .map(entry -> entry.getKey() + " = " + entry.getValue() + " units")
+                .toArray(String[]::new);
+    }
+
     
 
    
@@ -167,8 +181,13 @@ public class mainpageTest extends Application {
         
         balance = (Float) this.curAccount.get("balance");
 
-        lineGraphRef = new JavaFXLineGraph();
-        lineGraphStackPane = lineGraphRef.createStackPane();
+
+        //Could be a problem?
+        if (lineGraphRef == null) {
+            lineGraphRef = new JavaFXLineGraph();
+            lineGraphStackPane = lineGraphRef.createStackPane();
+
+        }
         lineGraphRef.currentCustomerProperty().addListener((obs, oldStock, newStock) -> {
             System.out.println("OBS: "+ obs);
             System.out.println("oldStk: "+ oldStock);
@@ -553,8 +572,14 @@ public class mainpageTest extends Application {
         StackPane visPane = new StackPane();
         GridPane.setHgrow(visPane, Priority.NEVER);
         GridPane.setVgrow(visPane, Priority.NEVER);
+       
         
         visPane.getStyleClass().add("mainpage-cellStyle-2");
+
+        
+
+
+
         grid.add(visPane, 0, 4, 4, 1);
         //#endregion
 
@@ -734,20 +759,36 @@ public class mainpageTest extends Application {
 
         buySellButton.setOnAction(event -> {
 
-            System.out.println("BUYING " + curStockName);
-            if (subTitleTradeDet.getText() != "" && inputField.getText() != "")  {
-                
-                if (marketButton.getStyleClass().contains("button-selected")) {
-                    System.out.println("Buy button clicked");           
+            System.out.println("PROCESSING " + curStockName);
+            System.out.println(ctgrLabelOutput.isVisible());
 
-                    notifyAllListeners(inputField.getText(), false, curStockName); //Sends the event listener to python...
-                    // Add your buy functionality here
-                } else if (profileButton.getStyleClass().contains("button-selected")) {
-                    System.out.println("Sell button clicked");
-                    notifyAllListeners(inputField.getText(), true, curStockName); //Sends the event listener to python...
-                    // Add your sell functionality here
+            if (ctgrStackLabelOutput.isVisible() == true) {
+                if (subTitleTradeDet.getText().isEmpty() || inputField.getText().isEmpty()) {
+                    showAlert(AlertType.ERROR, "Transaction", "Missing Stock Detail or Quantity");
+                } else {
+                    if (marketButton.getStyleClass().contains("button-selected")) {
+                        System.out.println("Buy button clicked");
+                        notifyAllListeners(inputField.getText(), false, curStockName);
+                        // Add your buy functionality here
+                    }
                 }
-            } 
+            } else {
+                if (profileButton.getStyleClass().contains("button-selected") && !inputField.getText().isEmpty()) {
+                    System.out.println("Sell button clicked");
+                    stocksListView.getItems().clear();
+
+                    notifyAllListeners(inputField.getText(), true, curStockName);
+
+                    // Update the ListView
+                    ObservableList<String> items = FXCollections.observableArrayList(formatStocks(mainpageTest.objProfileInstance.getStocks()));
+                    stocksListView.setItems(items);
+
+                    // Add your sell functionality here
+                } else {
+                    showAlert(AlertType.ERROR, "Transaction", "Missing Stock Amount");
+                }
+            }
+             
             
             if (subTitleTradeDet.getText() == "" || inputField.getText() == "") {
                 showAlert(AlertType.ERROR, "Transaction", "Missing Quantity or Havent Selected Stock.");
@@ -924,6 +965,12 @@ public class mainpageTest extends Application {
             marketButton.getStyleClass().addAll( "button-selected");
             marketPane.getStyleClass().add("mainpage-cellStyle");
 
+            //Enable
+            ctgryStackLabel.setVisible(true);
+            priceStackLabel.setVisible(true);
+            ctgrStackLabelOutput.setVisible(true);
+            priceStackLabelOutput.setVisible(true);
+
              //Button Text
              buySellButton.setText("Buy");
 
@@ -986,6 +1033,12 @@ public class mainpageTest extends Application {
             homePane.getStyleClass().add("mainpage-cellStyle");
 
 
+            //Enable
+            ctgryStackLabel.setVisible(true);
+            priceStackLabel.setVisible(true);
+            ctgrStackLabelOutput.setVisible(true);
+            priceStackLabelOutput.setVisible(true);
+
             // Create colored content for homeButton
             
            
@@ -1010,6 +1063,10 @@ public class mainpageTest extends Application {
             profileButton.getStyleClass().clear();
             profileButton.getStyleClass().add("button");
         });
+
+
+
+
         
         profileButton.setOnAction(event -> {
             profileButton.getStyleClass().clear(); // Clear existing styles
@@ -1019,7 +1076,14 @@ public class mainpageTest extends Application {
             //Button Text
             buySellButton.setText("Sell");
 
+
+            //Disable Categories and Prices Label
+            ctgryStackLabel.setVisible(false);
+            priceStackLabel.setVisible(false);
+            ctgrStackLabelOutput.setVisible(false);
+            priceStackLabelOutput.setVisible(false);
             
+                    
             // Create colored content for profileButton
             StackPane profileContent = new StackPane();
             profileContent.setStyle("-fx-background-color: #1E1E1E;"); // Set background color
@@ -1028,9 +1092,9 @@ public class mainpageTest extends Application {
             profileContentGrid.setVgap(5);
 
             ColumnConstraints profileContentGridCol0 = new ColumnConstraints();
-            profileContentGridCol0.setPercentWidth(50);
+            profileContentGridCol0.setPercentWidth(40);
             ColumnConstraints profileContentGridCol1 = new ColumnConstraints();
-            profileContentGridCol1.setPercentWidth(50);
+            profileContentGridCol1.setPercentWidth(60);
 
             profileContentGrid.getColumnConstraints().addAll(profileContentGridCol0, profileContentGridCol1);
 
@@ -1041,12 +1105,16 @@ public class mainpageTest extends Application {
 
             profileContentGrid.getRowConstraints().addAll(profileContentGridRow0, profileContentGridRow1);
 
-            
-            ImageView profilePicture = new ImageView();
-            profilePicture.setFitWidth(150);
-            profilePicture.setFitHeight(150);
-            profilePicture.setImage(new Image(new File("src/main/java/com/example/profile_picture.png").toURI().toString()));
 
+            ImageView profilePicture = new ImageView();
+            profilePicture.setFitWidth(180);
+            profilePicture.setFitHeight(180);
+            profilePicture.setImage(new Image(new File("src/main/java/com/example/profile_picture.png").toURI().toString()));
+            
+            GridPane.setHgrow(profileContent, Priority.NEVER);
+            GridPane.setVgrow(profileContent, Priority.NEVER);
+            profileContent.setMinSize(250, 10);
+            profileContent.setMaxSize(600, Double.MAX_VALUE);
 
 
             StackPane profStackPane = new StackPane(); 
@@ -1056,25 +1124,65 @@ public class mainpageTest extends Application {
 
             // Username
             Label usernameLabel = new Label((String)this.curAccount.get("name"));
-            usernameLabel.setStyle("-fx-text-fill: #FFFFFF; -fx-font-size: 24;"); // White text, size 24
+            usernameLabel.setStyle("-fx-text-fill: #DC5F00; -fx-font-size: 40;"); // Set text color
 
             // Company ID
             Label companyIdLabel = new Label("Company ID: " + (String)this.curAccount.get("companyID"));
             companyIdLabel.setStyle("-fx-text-fill: #FFFFFF; -fx-font-size: 18;"); // White text, size 18
-            companyIdLabel.setTranslateY(20);
+            
+            // Total Investment
+            Label userInvestment = new Label("Investment Total: [placeholder]");
+            userInvestment.setStyle("-fx-text-fill: #FFFFFF; -fx-font-size: 18;"); // White text, size 18
+
+            // Current Account Cash
+            Label userCurrentCash = new Label("Current Account Cash: "+ balance);
+            userCurrentCash.setStyle("-fx-text-fill: #FFFFFF; -fx-font-size: 18;"); // White text, size 18
+
+            System.out.println(userCurrentCash);
 
 
-            StackPane profDetStackPane = new StackPane();
-            profDetStackPane.getChildren().addAll(companyIdLabel,usernameLabel);
+            GridPane profileDetailsGrid = new GridPane();
+            profileDetailsGrid.setVgap(2);
+            profileDetailsGrid.add(usernameLabel, 0, 0);
+            profileDetailsGrid.add(companyIdLabel, 0, 1);
+            profileDetailsGrid.add(userInvestment, 0, 2);
+            profileDetailsGrid.add(userCurrentCash, 0, 3);
 
-            // profDetStackPane.setStyle("-fx-background-color: yellow;");
 
+            // List view
             StackPane profListStackPane = new StackPane();
-            // profListStackPane.setStyle("-fx-background-color: green;");
+            stocksListView = new ListView<>();
+            stocksListView.getItems().addAll(formatStocks(mainpageTest.objProfileInstance.getStocks()));
 
+            stocksListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+                if (newValue != null) {
+                    System.out.println("Selected Stock: " + newValue);
+
+                    String regex = "^(.*?) = \\d+\\.0 units";
+                    Pattern pattern = Pattern.compile(regex);
+                    Matcher matcher = pattern.matcher(newValue);
+
+                    // Check if the matcher finds a match
+                    if (matcher.find()) {
+                        // Extract the company ID
+                        String stockVal = matcher.group(1); // Group 1 captures the (\d+) part
+                        curStockName = stockVal;
+                        subTitleTradeDet.setText("ITEM: " + stockVal);
+                    } else {
+                        System.out.println("No stock found in input.");
+                    }
+
+
+                   
+                    
+                    
+                }   
+            });
+
+            profListStackPane.getChildren().add(stocksListView);
 
             profileContentGrid.add(profStackPane, 0, 0);
-            profileContentGrid.add(profDetStackPane, 1, 0);
+            profileContentGrid.add(profileDetailsGrid, 1, 0);
             profileContentGrid.add(profListStackPane, 0, 1, 2, 1);
 
 
@@ -1158,39 +1266,62 @@ public class mainpageTest extends Application {
     } 
 
     //#endregion
+    public static boolean endOfDay = false;
 
     public Boolean GetLeaderBoardFromPy(String list) {
         Gson gson = new Gson();
         Object[] leaderboard = gson.fromJson(list, Object[].class);
         String json = gson.toJson(leaderboard);
         
-        for (int i = 0; i < 3; i++) {
-            Map<String, Object> map = (Map<String, Object>) leaderboard[i];
-            final String name = (String) map.get("name");
-            final double amount = (double) map.get("amount");
-            final double cashBalance = (double) map.get("cash_balance");
-            final double totalInvestment = (double) map.get("total_investment");
-            final int index = i; // Create a final variable
+        if (endOfDay == false) {
+            //Show Top 3 
+            for (int i = 0; i < 3; i++) {
+                Map<String, Object> map = (Map<String, Object>) leaderboard[i];
+                final String name = (String) map.get("name");
+                final double amount = (double) map.get("amount");
+                final double cashBalance = (double) map.get("cash_balance");
+                final double totalInvestment = (double) map.get("total_investment");
+                final int index = i; // Create a final variable
 
-            
-            System.out.println("Name: " + name);
-            System.out.println("Amount: " + amount);
-            System.out.println("Cash Balance: " + cashBalance);
-            System.out.println("Total Investment: " + totalInvestment);
-            System.out.println();
+                
+                System.out.println("Name: " + name);
+                System.out.println("Amount: " + amount);
+                System.out.println("Cash Balance: " + cashBalance);
+                System.out.println("Total Investment: " + totalInvestment);
+                System.out.println();
 
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (index == 0) {
+                            p1N.setText(name);
+                            p1S.setText(String.format("Current Employee Balance: %.2f $HK\nTotal Investments: %.2f $HK", cashBalance, totalInvestment));
+                        } else if (index == 1) {
+                            p2N.setText(name);
+                            p2S.setText(String.format("Current Employee Balance: %.2f $HK\nTotal Investments: %.2f $HK", cashBalance, totalInvestment));
+                        } else if (index == 2) {
+                            p3N.setText(name);
+                            p3S.setText(String.format("Current Employee Balance: %.2f $HK\nTotal Investments: %.2f $HK", cashBalance, totalInvestment));
+                        }
+                    }
+                });
+            }
+
+            //Show all Top 10 Players 
+            // Show all Top 10 Players in ListView
             Platform.runLater(new Runnable() {
                 @Override
                 public void run() {
-                    if (index == 0) {
-                        p1N.setText(name);
-                        p1S.setText(String.format("Current Employee Balance: %.2f $HK\nTotal Investments: %.2f $HK", cashBalance, totalInvestment));
-                    } else if (index == 1) {
-                        p2N.setText(name);
-                        p2S.setText(String.format("Current Employee Balance: %.2f $HK\nTotal Investments: %.2f $HK", cashBalance, totalInvestment));
-                    } else if (index == 2) {
-                        p3N.setText(name);
-                        p3S.setText(String.format("Current Employee Balance: %.2f $HK\nTotal Investments: %.2f $HK", cashBalance, totalInvestment));
+                    listView = (ListView<String>) overlay.getChildren().get(0);
+                    listView.getItems().clear(); // Clear existing items
+
+                    for (int i = 0; i < leaderboard.length && i < 10; i++) {
+                        Map<String, Object> map = (Map<String, Object>) leaderboard[i];
+                        String name = (String) map.get("name");
+                        double cashBalance = (double) map.get("cash_balance");
+                        double totalInvestment = (double) map.get("total_investment");
+
+                        listView.getItems().add(String.format("Employee: %s \nCash Balance: %.2f $HK \nTotal Investments: %.2f $HK", name, cashBalance, totalInvestment));
                     }
                 }
             });
@@ -1202,29 +1333,34 @@ public class mainpageTest extends Application {
 
     public void newDayFunction(String data) {
         System.out.println("Passed data "+ data);
-        simulateRoundEnd();
         leaderBoardListener();
-    }
+        simulateRoundEnd();
 
-    private VBox overlay;
+    }
+    public static ListView<String> listView;
+    public static VBox overlay;
     private TranslateTransition transitionUp;
     private TranslateTransition transitionDown;
+    Label leaderBoardTitleLabel;
 
     private void createOverlay(Scene scene, StackPane stackPane) {
         overlay = new VBox(20);
-        overlay.setStyle("-fx-background-color: black; -fx-alignment: center;");
-        overlay.setPrefSize(scene.getWidth(), scene.getHeight());
+        overlay.setStyle("-fx-background-color: black; -fx-alignment: center; -fx-padding: 10px 10px;");
+        overlay.setPrefSize(scene.getWidth() * .5, scene.getHeight());
     
-        // Create a ListView and add 10 items
-        ListView<String> listView = new ListView<>();
-        for (int i = 1; i <= 10; i++) {
-            listView.getItems().add("Item " + i);
-        }
+        // Add Performance Today title with inline CSS
+        /*leaderBoardTitleLabel = new Label("Performance Today");
+        leaderBoardTitleLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: white;"); // Inline CSS for font size and text color
+        overlay.getChildren().add(leaderBoardTitleLabel); // Add ListView directly to overlay*/
+
+        // Create a ListView for leaderboard
+        listView = new ListView<>();
+        overlay.getChildren().add(listView); // Add ListView directly to overlay
     
-        Button closeButton = new Button("Close");
+        Button closeButton = new Button("Close Daily Performance List");
         closeButton.setOnAction(e -> closeOverlay());
     
-        overlay.getChildren().addAll(listView, closeButton);
+        overlay.getChildren().add(closeButton); // Add close button
     
         stackPane.getChildren().add(overlay);
     
@@ -1239,16 +1375,19 @@ public class mainpageTest extends Application {
         transitionDown.setToY(scene.getHeight());
     }
     
+    
 
     
     private void simulateRoundEnd() {
         transitionUp.play();
         fastClock.pauseClock();
+        endOfDay = true;
     }
 
     private void closeOverlay() {
         transitionDown.play();
         fastClock.resumeClock();
+        endOfDay = false;
     }
 
 
