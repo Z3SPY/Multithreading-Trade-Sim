@@ -201,7 +201,7 @@ public class mainpageTest extends Application {
 
     //#region MAIN SCENE FRONTEND
     public Scene createMainScene(Stage mainStage) {
-        FastClock fastClock = new FastClock();
+        FastClock fastClock = new FastClock(this);
         GridPane grid = new GridPane();
         grid.setHgap(10); // Horizontal gap between columns
         grid.setVgap(10); // Vertical gap between rows
@@ -544,7 +544,7 @@ public class mainpageTest extends Application {
 
         //#region Info Pane and Bottom Right Grid
         StackPane infoPane = new StackPane();
-        infoPane.setTranslateY(-5);
+        infoPane.setTranslateY(5);
         grid.add(infoPane, 4, 3, 2, 3);
 
         GridPane infoGridPane = new GridPane();
@@ -766,13 +766,13 @@ public class mainpageTest extends Application {
         RowConstraints leaderGridRow0 = new RowConstraints();
         leaderGridRow0.setPercentHeight(25);
         RowConstraints leaderGridRow1 = new RowConstraints();
-        leaderGridRow1.setPercentHeight(20);
+        leaderGridRow1.setPercentHeight(23.5);
         RowConstraints leaderGridRow2 = new RowConstraints();
-        leaderGridRow2.setPercentHeight(20);
+        leaderGridRow2.setPercentHeight(23.3);
         RowConstraints leaderGridRow3 = new RowConstraints();
-        leaderGridRow3.setPercentHeight(20);
+        leaderGridRow3.setPercentHeight(23.3);
         RowConstraints leaderGridRow4 = new RowConstraints();
-        leaderGridRow4.setPercentHeight(15);
+        leaderGridRow4.setPercentHeight(5);
 
         leaderGrid.getRowConstraints().addAll(leaderGridRow0, leaderGridRow1, leaderGridRow2, leaderGridRow3, leaderGridRow4);
 
@@ -798,8 +798,9 @@ public class mainpageTest extends Application {
         p1N.setStyle("-fx-text-color: #1E1E1E;");
         StackPane plyr1Status = new StackPane();
         plyr1Status.setStyle("-fx-border-color: #DC5F00;");
-        p1S = new Label("Active");
+        p1S = new Label("Current Balance: 1000 \nPortfolio Value: 1000");
         p1S.setStyle("-fx-text-fill: #DC5F00");
+        
 
         plyr1Name.getChildren().addAll(p1N);
         plyr1Status.getChildren().addAll(p1S);
@@ -810,7 +811,7 @@ public class mainpageTest extends Application {
         p2N.setStyle("-fx-text-color: #1E1E1E;");
         StackPane plyr2Status = new StackPane();
         plyr2Status.setStyle("-fx-border-color: #DC5F00;");
-        p2S = new Label("Inactive");
+        p2S = new Label("Current Balance: 1000 \nPortfolio Value: 1000");
         p2S.setStyle("-fx-text-fill: #DC5F00");
 
 
@@ -823,13 +824,20 @@ public class mainpageTest extends Application {
         p3N.setStyle("-fx-text-color: #1E1E1E;");
         StackPane plyr3Status = new StackPane();
         plyr3Status.setStyle("-fx-border-color: #DC5F00;");
-        p3S = new Label("Active");
+        p3S = new Label("Current Balance: 1000 \nPortfolio Value: 1000");
         p3S.setStyle("-fx-text-fill: #DC5F00");
 
 
         plyr3Name.getChildren().addAll(p3N);
         plyr3Status.getChildren().addAll(p3S);
 
+        plyr1Status.setAlignment(Pos.TOP_LEFT);
+        plyr2Status.setAlignment(Pos.TOP_LEFT);
+        plyr3Status.setAlignment(Pos.TOP_LEFT);
+
+        p1S.setTranslateX(10);
+        p2S.setTranslateX(10);
+        p3S.setTranslateX(10);
 
 
 
@@ -850,12 +858,12 @@ public class mainpageTest extends Application {
 
 
         // Robot Design 
-        StackPane roboFace = new StackPane();
+       /*  StackPane roboFace = new StackPane();
         Region roboDesign = new Region();
         roboDesign.setStyle("-fx-background-color:  #DC5F00;");
 
         leaderGrid.add(roboFace,0, 4, 1, 1);
-        leaderGrid.add(roboDesign,1, 4, 1, 1);
+        leaderGrid.add(roboDesign,1, 4, 1, 1);*/
 
         
 
@@ -1170,6 +1178,9 @@ public class mainpageTest extends Application {
         }
     }
 
+    public void newDayFunction(String data) {
+        System.out.println("Passed data "+ data);
+    }
 
     public static void main(String[] args) {
         launch(args);
