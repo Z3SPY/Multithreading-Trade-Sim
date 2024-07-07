@@ -10,6 +10,8 @@ import java.util.regex.Pattern;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
+import javafx.animation.Timeline;
+import javafx.animation.TranslateTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
@@ -19,6 +21,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -33,6 +36,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import py4j.GatewayServer;
 
 public class mainpageTest extends Application {
@@ -58,7 +62,8 @@ public class mainpageTest extends Application {
     //private Py4JGatewayServer py4jServer;
 
     private TextField inputField;
-    
+    public static FastClock fastClock;
+
 
     public Map<String, Object> curAccount;
     public static Profile objProfileInstance;
@@ -79,6 +84,15 @@ public class mainpageTest extends Application {
     // Registers all available Interfaces
     public void registerListener(ProfileInterface listener) {
         listeners.add(listener);
+    }
+
+
+    public void leaderBoardListener() {
+        for (ProfileInterface listener : listeners) {
+            
+            listener.updateLeader();
+
+        }
     }
 
     public void notifyAllListeners(String qtyInput, Boolean btnState, String stockName) {
@@ -139,9 +153,10 @@ public class mainpageTest extends Application {
     }
 
     public void updateWalletBalance(float newBal) {
-        balance =  newBal;
-        balanceLabel.setText("BALANCE: " + balance);
+        balance = newBal;
+        balanceLabel.setText(String.format("BALANCE: %.2f $HK", balance));
     }
+    
 
    
 
@@ -149,7 +164,7 @@ public class mainpageTest extends Application {
     @Override
     public void start(Stage mainStage) {
         createGateWayServer(); // Creates a gateway for python to send data
-
+        
         balance = (Float) this.curAccount.get("balance");
 
         lineGraphRef = new JavaFXLineGraph();
@@ -183,25 +198,26 @@ public class mainpageTest extends Application {
             }
 
             System.out.println(curStockName);
+
             
         });
         
 
 
         Scene mainScene = createMainScene(mainStage);
-        mainScene.getStylesheets().add(this.getClass().getResource("chart.css").toExternalForm());
         
+
+        mainScene.getStylesheets().add(this.getClass().getResource("chart.css").toExternalForm());
         mainStage.setTitle("ISTO SYSTEM");
         mainStage.setScene(mainScene);
         mainStage.setResizable(false);
         mainStage.show();
     }
     
-    
 
     //#region MAIN SCENE FRONTEND
     public Scene createMainScene(Stage mainStage) {
-        FastClock fastClock = new FastClock(this);
+        fastClock = new FastClock(this);
         GridPane grid = new GridPane();
         grid.setHgap(10); // Horizontal gap between columns
         grid.setVgap(10); // Vertical gap between rows
@@ -469,7 +485,7 @@ public class mainpageTest extends Application {
         titleLabel.setTextFill(Color.WHITE);
         titleLabel.setFont(Font.font("Arial", 28)); // Adjust font and size as needed
         // Create the Balance label
-        balanceLabel = new Label("BALANCE: " + balance); // Chagne Balance
+        balanceLabel.setText(String.format("BALANCE: %.2f $HK", balance));
         balanceLabel.setTranslateX(25);
         balanceLabel.setTranslateY(5);
         balanceLabel.setTextFill(Color.WHITE);
@@ -544,7 +560,7 @@ public class mainpageTest extends Application {
 
         //#region Info Pane and Bottom Right Grid
         StackPane infoPane = new StackPane();
-        infoPane.setTranslateY(5);
+        infoPane.setTranslateY(-5);
         grid.add(infoPane, 4, 3, 2, 3);
 
         GridPane infoGridPane = new GridPane();
@@ -1083,13 +1099,16 @@ public class mainpageTest extends Application {
 
         //#endregion
         
+        StackPane mainStackpane = new StackPane();
+        mainStackpane.getChildren().add(grid);
 
-        
-
-        Scene scene = new Scene(grid, 900, 750);
+        Scene scene = new Scene(mainStackpane, 900, 850);
         scene.setCamera(new PerspectiveCamera());
         scene.getStylesheets().add(getClass().getResource("/com/example/styles.css").toExternalForm());
         
+        createOverlay(scene, mainStackpane);
+
+
         return scene;
     }
     //#endregion
@@ -1140,7 +1159,7 @@ public class mainpageTest extends Application {
 
     //#endregion
 
-    public void GetLeaderBoardFromPy(String list) {
+    public Boolean GetLeaderBoardFromPy(String list) {
         Gson gson = new Gson();
         Object[] leaderboard = gson.fromJson(list, Object[].class);
         String json = gson.toJson(leaderboard);
@@ -1165,22 +1184,73 @@ public class mainpageTest extends Application {
                 public void run() {
                     if (index == 0) {
                         p1N.setText(name);
-                        p1S.setText(Double.toString(cashBalance));
+                        p1S.setText(String.format("Current Employee Balance: %.2f $HK\nTotal Investments: %.2f $HK", cashBalance, totalInvestment));
                     } else if (index == 1) {
                         p2N.setText(name);
-                        p2S.setText(Double.toString(cashBalance));
+                        p2S.setText(String.format("Current Employee Balance: %.2f $HK\nTotal Investments: %.2f $HK", cashBalance, totalInvestment));
                     } else if (index == 2) {
                         p3N.setText(name);
-                        p3S.setText(Double.toString(cashBalance));
+                        p3S.setText(String.format("Current Employee Balance: %.2f $HK\nTotal Investments: %.2f $HK", cashBalance, totalInvestment));
                     }
                 }
             });
         }
+
+
+        return true;
     }
 
     public void newDayFunction(String data) {
         System.out.println("Passed data "+ data);
+        simulateRoundEnd();
+        leaderBoardListener();
     }
+
+    private VBox overlay;
+    private TranslateTransition transitionUp;
+    private TranslateTransition transitionDown;
+
+    private void createOverlay(Scene scene, StackPane stackPane) {
+        overlay = new VBox(20);
+        overlay.setStyle("-fx-background-color: black; -fx-alignment: center;");
+        overlay.setPrefSize(scene.getWidth(), scene.getHeight());
+    
+        // Create a ListView and add 10 items
+        ListView<String> listView = new ListView<>();
+        for (int i = 1; i <= 10; i++) {
+            listView.getItems().add("Item " + i);
+        }
+    
+        Button closeButton = new Button("Close");
+        closeButton.setOnAction(e -> closeOverlay());
+    
+        overlay.getChildren().addAll(listView, closeButton);
+    
+        stackPane.getChildren().add(overlay);
+    
+        // Initialize the overlay's position (off-screen at the bottom)
+        overlay.setTranslateY(scene.getHeight());
+    
+        // Set up the transitions
+        transitionUp = new TranslateTransition(Duration.seconds(1), overlay);
+        transitionUp.setToY(0);
+    
+        transitionDown = new TranslateTransition(Duration.seconds(1), overlay);
+        transitionDown.setToY(scene.getHeight());
+    }
+    
+
+    
+    private void simulateRoundEnd() {
+        transitionUp.play();
+        fastClock.pauseClock();
+    }
+
+    private void closeOverlay() {
+        transitionDown.play();
+        fastClock.resumeClock();
+    }
+
 
     public static void main(String[] args) {
         launch(args);

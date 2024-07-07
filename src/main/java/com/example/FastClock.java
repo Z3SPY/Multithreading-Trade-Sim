@@ -88,7 +88,7 @@ public class FastClock {
         
 
         // Changed Seconds for debugging
-        KeyFrame keyFrame = new KeyFrame(Duration.seconds(0.01), e -> {
+        KeyFrame keyFrame = new KeyFrame(Duration.seconds(0.1), e -> {
             clockMinutes = clockMinutes+5;
             if (clockMinutes == 60) {
                 clockHours++;
@@ -116,6 +116,18 @@ public class FastClock {
 
         timeline.getKeyFrames().add(keyFrame);
         timeline.play();
+    }
+
+    public void pauseClock() {
+        if (timeline != null) {
+            timeline.pause();
+        }
+    }
+
+    public void resumeClock() {
+        if (timeline != null) {
+            timeline.play();
+        }
     }
 
     public String getCurrentMonth() {

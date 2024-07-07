@@ -76,9 +76,11 @@ public class login extends Application {
                 System.out.println("user: "+companyId+" has logged in");
                 mainpageTest mainPage = new mainpageTest(profileInstance);
                 mainPage.start(primaryStage);
+                
+
+            } else {
                 System.out.println("Invalid username or password");
                 showAlert(AlertType.ERROR, "Login Failed", "Invalid username or password.");
-
             }
 
             mongoDBUtil.close();

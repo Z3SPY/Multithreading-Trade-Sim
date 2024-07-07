@@ -237,6 +237,15 @@ space_nasdaq = [
         Stock("Void Crystals", 280, "ENERGY")
 ]
 
+# Instantiate classes
+active_players = {
+    Player("John Doe", 10000),
+    Player("Alongy", 10000),
+    Player("Haijee", 10000),
+    Player("Bob", 10000),
+    Player("Samenta", 10000)
+}
+
 #Profile Entry Point
 class ProfileEntryPoint:
     def __init__(self, gateway):
@@ -248,6 +257,11 @@ class ProfileEntryPoint:
         self.profileName = None
         self.profileList = None
         self.profileBal = None
+
+    def updateLeader(self):
+        for player_active in active_players:
+            player_active.sell_stocks(space_nasdaq)
+            print(player_active.getPort())
 
     def search_stock(self, stock_name):
         #print(space_nasdaq)
@@ -379,14 +393,7 @@ def main():
     # Connect to the Java GatewayServer
     java_gateway = JavaGateway()
     
-    # Instantiate classes
-    active_players = {
-        Player("John Doe", 10000),
-        Player("Alongy", 10000),
-        Player("Haijee", 10000),
-        Player("Bob", 10000),
-        Player("Samenta", 10000)
-    }
+    
 
     leaderboard = Leaderboard(active_players)
 
