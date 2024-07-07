@@ -152,8 +152,8 @@ public class mainpageTest extends Application {
         }
     }
 
-    public void updateWalletBalance(float newBal) {
-        balance = newBal;
+    public void updateWalletBalance(Number newBal) {
+        balance = newBal.floatValue();
         balanceLabel.setText(String.format("BALANCE: %.2f $HK", balance));
     }
     
@@ -485,7 +485,7 @@ public class mainpageTest extends Application {
         titleLabel.setTextFill(Color.WHITE);
         titleLabel.setFont(Font.font("Arial", 28)); // Adjust font and size as needed
         // Create the Balance label
-        balanceLabel.setText(String.format("BALANCE: %.2f $HK", balance));
+        balanceLabel = new Label(String.format("BALANCE: %.2f $HK", balance));
         balanceLabel.setTranslateX(25);
         balanceLabel.setTranslateY(5);
         balanceLabel.setTextFill(Color.WHITE);
