@@ -1017,7 +1017,7 @@ public class mainpageTest extends Application {
 
             profileContentGrid.getRowConstraints().addAll(profileContentGridRow0, profileContentGridRow1);
 
-            
+
             ImageView profilePicture = new ImageView();
             profilePicture.setFitWidth(180);
             profilePicture.setFitHeight(180);
@@ -1062,8 +1062,32 @@ public class mainpageTest extends Application {
             // profDetStackPane.setStyle("-fx-background-color: yellow;");
 
             StackPane profListStackPane = new StackPane();
-            profListStackPane.setStyle("-fx-background-color: green;");
+            // profListStackPane.setStyle("-fx-background-color: green;");
 
+            HBox profStockList = new HBox();
+            HBox profStockList1 = new HBox();
+            HBox profStockList2 = new HBox();
+            HBox profStockList3 = new HBox();
+
+            
+
+
+            Label sampleStock1 = new Label("Meow");
+            sampleStock1.setStyle("-fx-text-fill: #FFFFFF; -fx-font-size: 18;");
+            profStockList.getChildren().addAll(sampleStock1);
+            profStockList1.getChildren().addAll(sampleStock1);
+            profStockList2.getChildren().addAll(sampleStock1);
+            profStockList3.getChildren().addAll(sampleStock1);
+            profStockList.getStyleClass().add("mainpage-cellStyle");
+            git
+
+            GridPane profileStocksList = new GridPane();
+            profileStocksList.setVgap(2);
+            profileContentGrid.add(profStockList, 0, 0);
+            profileContentGrid.add(profStockList1, 0, 1);
+            profileContentGrid.add(profStockList3, 0, 2);
+
+            profListStackPane.getChildren().add(profStockList);
 
             profileContentGrid.add(profStackPane, 0, 0);
             profileContentGrid.add(profileDetailsGrid, 1, 0);
