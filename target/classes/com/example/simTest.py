@@ -136,7 +136,7 @@ class Events:
         except Exception as e:
             print(f"Error passing stock data: {e}")
 
-    def generate_random_event(self, stock_list):
+    def generate_random_event(self, stock_list, gateway):
         events = [
             "WAR",
             "INFLATION",
@@ -145,14 +145,21 @@ class Events:
             "SPACE TOURISM REGULATIONS",
             "COLONIZATION OF MARS",
             "TECH STOCK CRASH",
-            "ALIEN ENCOUNTER",
+            "ALIEN ENCOUNTER",  
             "SPACE WEATHER DISRUPTION",
             "RESOURCE SCARCITY",
             "SPACE PIRATE ATTACK",
             "NOTHING NEW"
         ]
         self.event = random.choice(events)
+        print(f"Random Event: {self.event}")
         self.affect_stock_prices(stock_list)
+        
+
+        # Send the event to Java
+        java_app = gateway.entry_point
+        java_app.updateAlertText(self.event)
+
 
     def affect_stock_prices(self, stock_list):
         for stock in stock_list:
@@ -393,7 +400,7 @@ def main():
     event_system = Events()
 
     count = 0
-    tick_limit = 40
+    tick_limit = 10
    
     
     stop_flag = False
@@ -426,7 +433,7 @@ def main():
             event_system.passStockData(space_nasdaq, java_gateway)
         
         if count >= tick_limit:
-            event_system.generate_random_event(space_nasdaq)
+            event_system.generate_random_event(space_nasdaq, java_gateway)
             count = 0
 
     # Shutdown the gateway servers
