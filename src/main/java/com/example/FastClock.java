@@ -27,7 +27,10 @@ public class FastClock {
     private String[] months = {"Aprimay", "Jugust", "Septober", "Decembary"}; // custom months
     private int monthIndex = 0; // current month index
 
-    public FastClock() {
+    public static mainpageTest mainPageRef; 
+
+    public FastClock(mainpageTest ref) {
+        mainPageRef = ref;
         startClock();
     }
 
@@ -82,14 +85,17 @@ public class FastClock {
     private void startClock() {
         timeline = new Timeline();
         timeline.setCycleCount(Animation.INDEFINITE);
+        
 
-        KeyFrame keyFrame = new KeyFrame(Duration.seconds(10), e -> {
+        // Changed Seconds for debugging
+        KeyFrame keyFrame = new KeyFrame(Duration.seconds(0.1), e -> {
             clockMinutes = clockMinutes+5;
             if (clockMinutes == 60) {
                 clockHours++;
                 clockMinutes = 0;
                 if (clockHours == 24) {
                     day++;
+                    mainPageRef.newDayFunction("yo");
                     clockHours = 0;
                     if (day == 16) {
                         monthIndex++;
@@ -110,6 +116,18 @@ public class FastClock {
 
         timeline.getKeyFrames().add(keyFrame);
         timeline.play();
+    }
+
+    public void pauseClock() {
+        if (timeline != null) {
+            timeline.pause();
+        }
+    }
+
+    public void resumeClock() {
+        if (timeline != null) {
+            timeline.play();
+        }
     }
 
     public String getCurrentMonth() {

@@ -1,7 +1,10 @@
 package com.example;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 public class Profile {
     public String UserName;
@@ -28,8 +31,10 @@ public class Profile {
     }
 
     public Map<String, Float> getStocks() {
+
         return this.stocks;
     }
+
 
 
     public void updateProfileData(Float balance, Map<String, Float> stock) {
