@@ -4,12 +4,17 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.util.Duration;
+import java.util.Random;
 import javafx.animation.Timeline;
 import javafx.animation.TranslateTransition;
 import javafx.application.Application;
@@ -46,6 +51,7 @@ public class mainpageTest extends Application {
     public static JavaFXLineGraph lineGraphRef;
     public static StackPane lineGraphStackPane;
     public static Label balanceLabel;
+    private static Label alertNewsText;
     public static String curStockName;
     public static Float balance;
 
@@ -102,8 +108,6 @@ public class mainpageTest extends Application {
 
     public void notifyAllListeners(String qtyInput, Boolean btnState, String stockName) {
 
-
-
         for (ProfileInterface listener : listeners) {
             System.out.println(this.curAccount);
             System.out.println("Notify ");
@@ -127,7 +131,7 @@ public class mainpageTest extends Application {
                     // Parse the JSON string into the ReturnData object
                     String jsonString = (String) returnValue;
                     ReturnData returnData = gson.fromJson(jsonString, ReturnData.class);
-
+                    
                     // Access the parsed data
                     Map<String, Float> portfolio = (Map<String, Float>) returnData.getPortfolio();
                     double balance = returnData.getBalance();
@@ -340,7 +344,7 @@ public class mainpageTest extends Application {
         HBox hBox = new HBox();
 
         // Create the Label
-        Label alertNewsText = new Label("INTERSTELLAR UPDATES");
+        alertNewsText = new Label("INTERSTELLAR UPDATES");
         alertNewsText.setStyle("-fx-text-fill: #DC5F00;"); // Set text color
 
         // Create the left orange square
@@ -372,6 +376,7 @@ public class mainpageTest extends Application {
         GridPane.setVgrow(alertPane, Priority.NEVER);
         alertPane.setMinSize(25, 25);
         alertPane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+
 
         alertPane.getStyleClass().addAll("mainpage-cellStyle", "alert");
         midGridPane.add(alertPane, 2, 0, 1, 1);
@@ -1390,7 +1395,23 @@ public class mainpageTest extends Application {
         endOfDay = false;
     }
 
+    // Method to update the alert text
+    public void updateAlertText(String event) {
+        Platform.runLater(() -> {
+            alertNewsText.setText(event);
+            
+            // Create a Timeline for blinking effect
+            Timeline timeline = new Timeline(
+                new KeyFrame(Duration.seconds(0.5), e -> alertNewsText.setVisible(false)),
+                new KeyFrame(Duration.seconds(1), e -> alertNewsText.setVisible(true))
+            );
+            timeline.setCycleCount(4);  // Blinking 2 times (4 keyframes)
+            timeline.play();
 
+            // Revert to default text after blinking
+            timeline.setOnFinished(e -> alertNewsText.setText("INTERSTELLAR UPDATES"));
+        });
+    }
     public static void main(String[] args) {
         launch(args);
     }
