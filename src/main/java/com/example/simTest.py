@@ -131,6 +131,7 @@ class Events:
         data = json.dumps([vars(obj) for obj in stock_list])
 
         try:
+            print(data)
             java_app.updateStockPane(data)
         except Exception as e:
             print(f"Error passing stock data: {e}")

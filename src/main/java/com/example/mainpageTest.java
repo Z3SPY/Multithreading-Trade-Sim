@@ -9,6 +9,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
 import javafx.animation.KeyFrame;
@@ -54,6 +57,22 @@ public class mainpageTest extends Application {
     private static Label alertNewsText;
     public static String curStockName;
     public static Float balance;
+
+    //Updates 
+
+    public static StackPane square1;
+    public static StackPane square2;
+    public static StackPane square3;
+
+    public static Label r1Abbrv;
+    public static Label r1Prc;
+    public static Label r1Fluc;
+    public static Label r2Abbrv;
+    public static Label r2Prc;
+    public static Label r2Fluc;
+    public static Label r3Abbrv;
+    public static Label r3Prc;
+    public static Label r3Fluc;
 
     // Leaderboard
     public static Label p1N;
@@ -389,7 +408,7 @@ public class mainpageTest extends Application {
         //MIDDLE PANE TOP END
         //#endregion
         
-        //#region LOWER MIDDLE 
+        //#region LOWER MIDDLE BEST STOCK LIST
 
         StackPane lowerMiddlePane = new StackPane();
         grid.add(lowerMiddlePane, 0, 3, 4, 1);
@@ -612,8 +631,10 @@ public class mainpageTest extends Application {
 
         infoGridPane.getColumnConstraints().addAll(infoGridPaneCol0);
         infoGridPane.getRowConstraints().addAll(infoGridPaneRow0, infoGridPaneRow1, infoGridPaneRow2, infoGridPaneRow3);
+        //#endregion
+
+        //#region UPDATING PANE */
         
-        /* CONTAINS UPDATES ARROWS UPS AND DOWNS */
         StackPane stockUpdatePane = new StackPane();
         stockUpdatePane.setTranslateY(6);
         stockUpdatePane.getStyleClass().add("mainpage-cellStyle");
@@ -626,19 +647,77 @@ public class mainpageTest extends Application {
         HBox stockHBox = new HBox(15); // Horizontal box with spacing
         stockHBox.setMinSize(20, 20);
         stockHBox.setMaxSize(Double.MAX_VALUE, 70);
-        stockHBox.setTranslateX(20);
+        stockHBox.setTranslateX(7.5);
         
-        Region square1 = new Region();
-        square1.setMinSize(75, 50);
-        square1.setStyle("-fx-background-color: #1E1E1E; -fx-border-color: #DC5F00; -fx-border-width: 2;");
+         // Square 1
+         square1 = new StackPane();
+         square1.setMinSize(75, 50);
+         square1.setStyle("-fx-background-color: #DC5F00; -fx-border-color: #DC5F00; -fx-border-width: 2;");
+ 
+         Label r1Abbrv = new Label("[SR]");
+         r1Abbrv.setStyle("-fx-font-size: 20px;"); // Increase font size
+ 
+         double flucValue1 = 0.02;
+         Label r1Fluc = new Label("FLC: " + String.format("%.4f", flucValue1)); // 4 decimal places
+         
+         double prcValue1 = 23323.00;
+         Label r1Prc = new Label("PRC: " + String.format("%.2f", prcValue1)); // 2 decimal places
+ 
+         VBox square1Vbox = new VBox();
+         square1Vbox.setTranslateX(10);
+         square1Vbox.getChildren().addAll(r1Abbrv, r1Fluc, r1Prc);
+ 
+         square1Vbox.prefWidthProperty().bind(square1.widthProperty());
+         square1Vbox.prefHeightProperty().bind(square1.heightProperty());
+ 
+         square1.getChildren().add(square1Vbox);
+ 
+         // Square 2
+         square2 = new StackPane();
+         square2.setMinSize(75, 50);
+         square2.setStyle("-fx-background-color: #DC5F00; -fx-border-color: #DC5F00; -fx-border-width: 2;");
+ 
+         Label r2Abbrv = new Label("[SQ]");
+         r2Abbrv.setStyle("-fx-font-size: 20px;"); // Increase font size
+ 
+         double flucValue2 = 0.035;
+         Label r2Fluc = new Label("FLC: " + String.format("%.4f", flucValue2)); // 4 decimal places
+         
+         double prcValue2 = 19876.50;
+         Label r2Prc = new Label("PRC: " + String.format("%.2f", prcValue2)); // 2 decimal places
+ 
+         VBox square2Vbox = new VBox();
+         square2Vbox.setTranslateX(10);
+         square2Vbox.getChildren().addAll(r2Abbrv, r2Fluc, r2Prc);
+ 
+         square2Vbox.prefWidthProperty().bind(square2.widthProperty());
+         square2Vbox.prefHeightProperty().bind(square2.heightProperty());
+ 
+         square2.getChildren().add(square2Vbox);
+ 
+         // Square 3
+         square3 = new StackPane();
+         square3.setMinSize(75, 50);
+         square3.setStyle("-fx-background-color: #DC5F00; -fx-border-color: #DC5F00; -fx-border-width: 2;");
+ 
+         Label r3Abbrv = new Label("[RT]");
+         r3Abbrv.setStyle("-fx-font-size: 20px;"); // Increase font size
+ 
+         double flucValue3 = 0.025;
+         Label r3Fluc = new Label("FLC: " + String.format("%.4f", flucValue3)); // 4 decimal places
+         
+         double prcValue3 = 25500.75;
+         Label r3Prc = new Label("PRC: " + String.format("%.2f", prcValue3)); // 2 decimal places
+ 
+         VBox square3Vbox = new VBox();
+         square3Vbox.setTranslateX(10);
+         square3Vbox.getChildren().addAll(r3Abbrv, r3Fluc, r3Prc);
+ 
+         square3Vbox.prefWidthProperty().bind(square3.widthProperty());
+         square3Vbox.prefHeightProperty().bind(square3.heightProperty());
+ 
+         square3.getChildren().add(square3Vbox);
 
-        Region square2 = new Region();
-        square2.setMinSize(75, 50);
-        square2.setStyle("-fx-background-color: #1E1E1E; -fx-border-color: #DC5F00; -fx-border-width: 2;");
-
-        Region square3 = new Region();
-        square3.setMinSize(75, 50);
-        square3.setStyle("-fx-background-color: #1E1E1E; -fx-border-color: #DC5F00; -fx-border-width: 2;");
 
         stockHBox.getChildren().addAll(square1, square2, square3);
         StackPane.setAlignment(stockHBox, Pos.CENTER);
@@ -648,6 +727,8 @@ public class mainpageTest extends Application {
         lowerMiddlePane.getChildren().add(infoGridPane);
 
         //#endregion
+
+
 
         //#region Trade Details 
         StackPane tradeDetPane = new StackPane();
@@ -1256,18 +1337,101 @@ public class mainpageTest extends Application {
     //#region Stock Values and Simulation Updates
     public void updateStockPane(String JSONdata) {
         System.out.println("Updating Stock Pane");
-        lineGraphRef.updateStockValue(JSONdata);
 
-        Double curDouble = lineGraphRef.getSpecificStockValue(curStockName);
-        System.out.println(curDouble);
-        //Based on curStockName update:
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
+        // Initialize Gson
+        Gson gson = new Gson();
 
-                priceLabelOutput.setText(Double.toString((double) Math.round((curDouble * 10000)) / 10000));
+        // Parse the JSON data
+        JsonArray jsonArray = JsonParser.parseString(JSONdata).getAsJsonArray();
+
+        // Select 3 random stocks from the JSON array
+        Random random = new Random();
+        int[] randomIndices = new int[3];
+        for (int i = 0; i < 3; i++) {
+            randomIndices[i] = random.nextInt(jsonArray.size());
+        }
+
+        // Update UI on JavaFX Application Thread
+        Platform.runLater(() -> {
+            for (int i = 0; i < 3; i++) {
+                JsonObject stockEntry = jsonArray.get(randomIndices[i]).getAsJsonObject();
+
+                // Extract stockName
+                String stockName = stockEntry.get("stockName").getAsString();
+                // Extract stockPrice
+                double stockPrice = stockEntry.get("stockPrice").getAsDouble();
+                // Extract price_fluctuation
+                double priceFluctuation = stockEntry.get("price_fluctuation").getAsDouble();
+
+                // Convert stock name to abbreviation (example method)
+                String stockAbbreviation = convertToAbbreviation(stockName);
+
+                // Update respective square and labels
+                if (i == 0) {
+                    updateSquare(square1, stockAbbreviation, priceFluctuation, stockPrice);
+                } else if (i == 1) {
+                    updateSquare(square2, stockAbbreviation, priceFluctuation, stockPrice);
+                } else if (i == 2) {
+                    updateSquare(square3, stockAbbreviation, priceFluctuation, stockPrice);
+                }
+
+                System.out.println("Stock Name: " + stockName + " [" + stockAbbreviation + "]");
+                System.out.println("Stock Price: " + stockPrice);
+                System.out.println("Price Fluctuation: " + priceFluctuation);
             }
+
+            // Update any other UI components
+            lineGraphRef.updateStockValue(JSONdata);
+
+            Double curDouble = lineGraphRef.getSpecificStockValue(curStockName);
+            System.out.println(curDouble);
+
+            // Update UI component on JavaFX Application Thread
+            priceLabelOutput.setText(Double.toString((double) Math.round((curDouble * 10000)) / 10000));
         });
+    }
+
+    // Example method to update a square with labels
+    private void updateSquare(StackPane square, String abbreviation, double fluctuation, double price) {
+        // Clear previous content if any
+        square.getChildren().clear();
+        square.setMinSize(85, 75);
+        square.setMaxSize(85, 75);
+
+        // Create labels
+        Label abbrvLabel = new Label("[" + abbreviation + "]");
+        Label flucLabel = new Label("FLC " + String.format("%.4f", fluctuation));
+        Label prcLabel = new Label("PRC " + String.format("%.2f", price));
+
+        // Style labels as needed
+        abbrvLabel.setStyle("-fx-font-size: 20px;");
+        flucLabel.setStyle("-fx-font-size: 14px;");
+        prcLabel.setStyle("-fx-font-size: 14px;");
+
+        // Create VBox to hold labels
+        VBox vbox = new VBox();
+        vbox.getChildren().addAll(abbrvLabel, flucLabel, prcLabel);
+
+        // Bind VBox size to square size
+        vbox.prefWidthProperty().bind(square.widthProperty());
+        vbox.prefHeightProperty().bind(square.heightProperty());
+
+        // Add VBox to square
+        square.getChildren().add(vbox);
+    }
+
+    // Example method to convert stock name to abbreviation
+    private String convertToAbbreviation(String stockName) {
+        String[] words = stockName.split(" ");
+        StringBuilder abbreviation = new StringBuilder();
+
+        for (String word : words) {
+            if (!word.isEmpty()) {
+                abbreviation.append(word.charAt(0));
+            }
+        }
+
+        return abbreviation.toString().toUpperCase();
     } 
 
     //#endregion
