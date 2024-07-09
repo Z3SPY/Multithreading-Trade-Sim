@@ -10,16 +10,23 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.util.Duration;
 import java.util.Random;
+import javafx.animation.Timeline;
+import javafx.animation.TranslateTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.geometry.Insets;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
+import javafx.geometry.Insets;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -28,6 +35,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -43,6 +51,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import py4j.GatewayServer;
 
 public class mainpageTest extends Application {
@@ -53,6 +62,22 @@ public class mainpageTest extends Application {
     private static Label alertNewsText;
     public static String curStockName;
     public static Float balance;
+
+    //Updates 
+
+    public static StackPane square1;
+    public static StackPane square2;
+    public static StackPane square3;
+
+    public static Label r1Abbrv;
+    public static Label r1Prc;
+    public static Label r1Fluc;
+    public static Label r2Abbrv;
+    public static Label r2Prc;
+    public static Label r2Fluc;
+    public static Label r3Abbrv;
+    public static Label r3Prc;
+    public static Label r3Fluc;
 
     // Leaderboard
     public static Label p1N;
@@ -67,18 +92,26 @@ public class mainpageTest extends Application {
     Label subTitleTradeDet;
 
     private final String[] tutorialContent = {
-        "The top bar shows your wallet balance and company ID.",
-        "Use the ISTO MARKET button to view and buy stocks.",
-        "The ISTO HOME button shows your personal dashboard.",
+        "Welcome to ISTO SYSTEM! This tutorial will guide you through the main features.",
+        "The top-left shows your ISTO WALLET with your current balance and company ID.",
+        "Use the ISTO MARKET button to view and trade stocks.",
+        "The ISTO HOME button shows your personal dashboard and a visualization of the market.",
         "The ISTO PROFILE button displays your account information and owned stocks.",
-        "The chart in the center shows stock performance.",
+        "The chart in the center shows real-time stock performance.",
         "Use the Trade Details section to buy or sell stocks.",
-        "The leaderboard on the right shows top performers."
+        "The leaderboard on the right shows top-performing employees.",
+        "Keep an eye on the INTERSTELLAR UPDATES for important news that may affect the market.",
+        "The clock at the bottom shows the simulated time. Each day ends with a performance summary."
     };
 
     //private Py4JGatewayServer py4jServer;
 
-    private TextField inputField;    
+    private TextField inputField;
+    public static FastClock fastClock;
+
+
+    public static ListView<String> stocksListView;
+
 
     public Map<String, Object> curAccount;
     public static Profile objProfileInstance;
@@ -94,40 +127,30 @@ public class mainpageTest extends Application {
         Button tutorialButton = new Button("Tutorial");
         tutorialButton.getStyleClass().add("tutorial-btn");
         tutorialButton.setOnAction(e -> showTutorial());
-
-        GridPane.setMargin(tutorialButton, new Insets(5, 0, 25, 0));
-
         return tutorialButton;
     }
 
     private void showTutorial() {
-    Alert tutorial = new Alert(AlertType.INFORMATION);
-    tutorial.setTitle("ISTO SYSTEM Tutorial");
-    tutorial.setHeaderText("Welcome to ISTO SYSTEM!");
-    tutorial.getDialogPane().getStylesheets().add(getClass().getResource("/com/example/styles.css").toExternalForm());
-
-    // Create a TextArea to hold all the tutorial content
-    TextArea textArea = new TextArea(String.join("\n\n", tutorialContent));
-    textArea.setEditable(false);
-    textArea.setWrapText(true);
-    textArea.setPrefHeight(300);
-    textArea.setPrefWidth(400);
-
-    // Set the font size here
-    textArea.setStyle("-fx-font-size: 14px;"); // Adjust the size as needed
-
-    // Set the TextArea as the content of the dialog
-    tutorial.getDialogPane().setContent(textArea);
-
-    // Make the dialog resizable
-    tutorial.getDialogPane().setExpanded(true);
-    tutorial.getDialogPane().setExpandableContent(null);
-
-    // Only use a Close button
-    ButtonType closeButton = new ButtonType("Close", ButtonBar.ButtonData.CANCEL_CLOSE);
-    tutorial.getButtonTypes().setAll(closeButton);
-
-    tutorial.showAndWait();
+        Alert tutorial = new Alert(AlertType.INFORMATION);
+        tutorial.setTitle("ISTO SYSTEM Tutorial");
+        tutorial.setHeaderText("Welcome to ISTO SYSTEM!");
+        tutorial.getDialogPane().getStylesheets().add(getClass().getResource("/com/example/styles.css").toExternalForm());
+    
+        TextArea textArea = new TextArea(String.join("\n\n", tutorialContent));
+        textArea.setEditable(false);
+        textArea.setWrapText(true);
+        textArea.setPrefHeight(300);
+        textArea.setPrefWidth(400);
+        textArea.setStyle("-fx-font-size: 14px;");
+    
+        tutorial.getDialogPane().setContent(textArea);
+        tutorial.getDialogPane().setExpanded(true);
+        tutorial.getDialogPane().setExpandableContent(null);
+    
+        ButtonType closeButton = new ButtonType("Close", ButtonBar.ButtonData.CANCEL_CLOSE);
+        tutorial.getButtonTypes().setAll(closeButton);
+    
+        tutorial.showAndWait();
     }
     
 
@@ -137,6 +160,15 @@ public class mainpageTest extends Application {
     // Registers all available Interfaces
     public void registerListener(ProfileInterface listener) {
         listeners.add(listener);
+    }
+
+
+    public void leaderBoardListener() {
+        for (ProfileInterface listener : listeners) {
+            
+            listener.updateLeader();
+
+        }
     }
 
     public void notifyAllListeners(String qtyInput, Boolean btnState, String stockName) {
@@ -194,10 +226,20 @@ public class mainpageTest extends Application {
         }
     }
 
-    public void updateWalletBalance(float newBal) {
-        balance =  newBal;
-        balanceLabel.setText("BALANCE: " + balance);
+    public void updateWalletBalance(Number newBal) {
+        balance = newBal.floatValue();
+        balanceLabel.setText(String.format("BALANCE: %.2f $HK", balance));
     }
+
+
+
+    private String[] formatStocks(Map<String, Float> stocks) {
+        return stocks.entrySet().stream()
+                .map(entry -> entry.getKey() + " = " + entry.getValue() + " units")
+                .toArray(String[]::new);
+    }
+
+    
 
    
 
@@ -205,11 +247,16 @@ public class mainpageTest extends Application {
     @Override
     public void start(Stage mainStage) {
         createGateWayServer(); // Creates a gateway for python to send data
-
+        
         balance = (Float) this.curAccount.get("balance");
 
-        lineGraphRef = new JavaFXLineGraph();
-        lineGraphStackPane = lineGraphRef.createStackPane();
+
+        //Could be a problem?
+        if (lineGraphRef == null) {
+            lineGraphRef = new JavaFXLineGraph();
+            lineGraphStackPane = lineGraphRef.createStackPane();
+
+        }
         lineGraphRef.currentCustomerProperty().addListener((obs, oldStock, newStock) -> {
             System.out.println("OBS: "+ obs);
             System.out.println("oldStk: "+ oldStock);
@@ -239,25 +286,26 @@ public class mainpageTest extends Application {
             }
 
             System.out.println(curStockName);
+
             
         });
         
 
 
         Scene mainScene = createMainScene(mainStage);
-        mainScene.getStylesheets().add(this.getClass().getResource("chart.css").toExternalForm());
         
+
+        mainScene.getStylesheets().add(this.getClass().getResource("chart.css").toExternalForm());
         mainStage.setTitle("ISTO SYSTEM");
         mainStage.setScene(mainScene);
         mainStage.setResizable(false);
         mainStage.show();
     }
     
-    
 
     //#region MAIN SCENE FRONTEND
     public Scene createMainScene(Stage mainStage) {
-        FastClock fastClock = new FastClock();
+        fastClock = new FastClock(this);
         GridPane grid = new GridPane();
         grid.setHgap(10); // Horizontal gap between columns
         grid.setVgap(10); // Vertical gap between rows
@@ -342,11 +390,6 @@ public class mainpageTest extends Application {
         marketPane.getChildren().addAll(marketButton);
 
         /* =============================================  */
-
-        Button tutorialButton = createTutorialButton();
-        grid.add(tutorialButton, 0, 0); // Add the button to the top-left corner
-
-        /* =============================================  */
         StackPane homePane = new StackPane();
         homePane.getStyleClass().add("mainpage-cellStyle");
         midGridPane.add(homePane, 1, 0, 1, 1);
@@ -410,7 +453,7 @@ public class mainpageTest extends Application {
         //MIDDLE PANE TOP END
         //#endregion
         
-        //#region LOWER MIDDLE 
+        //#region LOWER MIDDLE BEST STOCK LIST
 
         StackPane lowerMiddlePane = new StackPane();
         grid.add(lowerMiddlePane, 0, 3, 4, 1);
@@ -520,6 +563,11 @@ public class mainpageTest extends Application {
         //#endregion
 
         //#region Wallet Pane
+        // Add tutorial button
+        Button tutorialButton = createTutorialButton();
+        GridPane.setConstraints(tutorialButton, 0, 0); // Adjust these values as needed
+        grid.getChildren().add(tutorialButton);
+
         StackPane walPane = new StackPane();
         walPane.getStyleClass().addAll("mainpage-cellStyle", "wallet");
 
@@ -530,7 +578,7 @@ public class mainpageTest extends Application {
         titleLabel.setTextFill(Color.WHITE);
         titleLabel.setFont(Font.font("Arial", 28)); // Adjust font and size as needed
         // Create the Balance label
-        balanceLabel = new Label("BALANCE: " + balance); // Chagne Balance
+        balanceLabel = new Label(String.format("BALANCE: %.2f $HK", balance));
         balanceLabel.setTranslateX(25);
         balanceLabel.setTranslateY(5);
         balanceLabel.setTextFill(Color.WHITE);
@@ -598,8 +646,14 @@ public class mainpageTest extends Application {
         StackPane visPane = new StackPane();
         GridPane.setHgrow(visPane, Priority.NEVER);
         GridPane.setVgrow(visPane, Priority.NEVER);
+       
         
         visPane.getStyleClass().add("mainpage-cellStyle-2");
+
+        
+
+
+
         grid.add(visPane, 0, 4, 4, 1);
         //#endregion
 
@@ -627,8 +681,10 @@ public class mainpageTest extends Application {
 
         infoGridPane.getColumnConstraints().addAll(infoGridPaneCol0);
         infoGridPane.getRowConstraints().addAll(infoGridPaneRow0, infoGridPaneRow1, infoGridPaneRow2, infoGridPaneRow3);
+        //#endregion
+
+        //#region UPDATING PANE */
         
-        /* CONTAINS UPDATES ARROWS UPS AND DOWNS */
         StackPane stockUpdatePane = new StackPane();
         stockUpdatePane.setTranslateY(6);
         stockUpdatePane.getStyleClass().add("mainpage-cellStyle");
@@ -641,19 +697,77 @@ public class mainpageTest extends Application {
         HBox stockHBox = new HBox(15); // Horizontal box with spacing
         stockHBox.setMinSize(20, 20);
         stockHBox.setMaxSize(Double.MAX_VALUE, 70);
-        stockHBox.setTranslateX(20);
+        stockHBox.setTranslateX(7.5);
         
-        Region square1 = new Region();
-        square1.setMinSize(75, 50);
-        square1.setStyle("-fx-background-color: #1E1E1E; -fx-border-color: #DC5F00; -fx-border-width: 2;");
+         // Square 1
+         square1 = new StackPane();
+         square1.setMinSize(75, 50);
+         square1.setStyle("-fx-background-color: #DC5F00; -fx-border-color: #DC5F00; -fx-border-width: 2;");
+ 
+         Label r1Abbrv = new Label("[SR]");
+         r1Abbrv.setStyle("-fx-font-size: 20px;"); // Increase font size
+ 
+         double flucValue1 = 0.02;
+         Label r1Fluc = new Label("FLC: " + String.format("%.4f", flucValue1)); // 4 decimal places
+         
+         double prcValue1 = 23323.00;
+         Label r1Prc = new Label("PRC: " + String.format("%.2f", prcValue1)); // 2 decimal places
+ 
+         VBox square1Vbox = new VBox();
+         square1Vbox.setTranslateX(10);
+         square1Vbox.getChildren().addAll(r1Abbrv, r1Fluc, r1Prc);
+ 
+         square1Vbox.prefWidthProperty().bind(square1.widthProperty());
+         square1Vbox.prefHeightProperty().bind(square1.heightProperty());
+ 
+         square1.getChildren().add(square1Vbox);
+ 
+         // Square 2
+         square2 = new StackPane();
+         square2.setMinSize(75, 50);
+         square2.setStyle("-fx-background-color: #DC5F00; -fx-border-color: #DC5F00; -fx-border-width: 2;");
+ 
+         Label r2Abbrv = new Label("[SQ]");
+         r2Abbrv.setStyle("-fx-font-size: 20px;"); // Increase font size
+ 
+         double flucValue2 = 0.035;
+         Label r2Fluc = new Label("FLC: " + String.format("%.4f", flucValue2)); // 4 decimal places
+         
+         double prcValue2 = 19876.50;
+         Label r2Prc = new Label("PRC: " + String.format("%.2f", prcValue2)); // 2 decimal places
+ 
+         VBox square2Vbox = new VBox();
+         square2Vbox.setTranslateX(10);
+         square2Vbox.getChildren().addAll(r2Abbrv, r2Fluc, r2Prc);
+ 
+         square2Vbox.prefWidthProperty().bind(square2.widthProperty());
+         square2Vbox.prefHeightProperty().bind(square2.heightProperty());
+ 
+         square2.getChildren().add(square2Vbox);
+ 
+         // Square 3
+         square3 = new StackPane();
+         square3.setMinSize(75, 50);
+         square3.setStyle("-fx-background-color: #DC5F00; -fx-border-color: #DC5F00; -fx-border-width: 2;");
+ 
+         Label r3Abbrv = new Label("[RT]");
+         r3Abbrv.setStyle("-fx-font-size: 20px;"); // Increase font size
+ 
+         double flucValue3 = 0.025;
+         Label r3Fluc = new Label("FLC: " + String.format("%.4f", flucValue3)); // 4 decimal places
+         
+         double prcValue3 = 25500.75;
+         Label r3Prc = new Label("PRC: " + String.format("%.2f", prcValue3)); // 2 decimal places
+ 
+         VBox square3Vbox = new VBox();
+         square3Vbox.setTranslateX(10);
+         square3Vbox.getChildren().addAll(r3Abbrv, r3Fluc, r3Prc);
+ 
+         square3Vbox.prefWidthProperty().bind(square3.widthProperty());
+         square3Vbox.prefHeightProperty().bind(square3.heightProperty());
+ 
+         square3.getChildren().add(square3Vbox);
 
-        Region square2 = new Region();
-        square2.setMinSize(75, 50);
-        square2.setStyle("-fx-background-color: #1E1E1E; -fx-border-color: #DC5F00; -fx-border-width: 2;");
-
-        Region square3 = new Region();
-        square3.setMinSize(75, 50);
-        square3.setStyle("-fx-background-color: #1E1E1E; -fx-border-color: #DC5F00; -fx-border-width: 2;");
 
         stockHBox.getChildren().addAll(square1, square2, square3);
         StackPane.setAlignment(stockHBox, Pos.CENTER);
@@ -663,6 +777,8 @@ public class mainpageTest extends Application {
         lowerMiddlePane.getChildren().add(infoGridPane);
 
         //#endregion
+
+
 
         //#region Trade Details 
         StackPane tradeDetPane = new StackPane();
@@ -779,20 +895,36 @@ public class mainpageTest extends Application {
 
         buySellButton.setOnAction(event -> {
 
-            System.out.println("BUYING " + curStockName);
-            if (subTitleTradeDet.getText() != "" && inputField.getText() != "")  {
-                
-                if (marketButton.getStyleClass().contains("button-selected")) {
-                    System.out.println("Buy button clicked");           
+            System.out.println("PROCESSING " + curStockName);
+            System.out.println(ctgrLabelOutput.isVisible());
 
-                    notifyAllListeners(inputField.getText(), false, curStockName); //Sends the event listener to python...
-                    // Add your buy functionality here
-                } else if (profileButton.getStyleClass().contains("button-selected")) {
-                    System.out.println("Sell button clicked");
-                    notifyAllListeners(inputField.getText(), true, curStockName); //Sends the event listener to python...
-                    // Add your sell functionality here
+            if (ctgrStackLabelOutput.isVisible() == true) {
+                if (subTitleTradeDet.getText().isEmpty() || inputField.getText().isEmpty()) {
+                    showAlert(AlertType.ERROR, "Transaction", "Missing Stock Detail or Quantity");
+                } else {
+                    if (marketButton.getStyleClass().contains("button-selected")) {
+                        System.out.println("Buy button clicked");
+                        notifyAllListeners(inputField.getText(), false, curStockName);
+                        // Add your buy functionality here
+                    }
                 }
-            } 
+            } else {
+                if (profileButton.getStyleClass().contains("button-selected") && !inputField.getText().isEmpty()) {
+                    System.out.println("Sell button clicked");
+                    stocksListView.getItems().clear();
+
+                    notifyAllListeners(inputField.getText(), true, curStockName);
+
+                    // Update the ListView
+                    ObservableList<String> items = FXCollections.observableArrayList(formatStocks(mainpageTest.objProfileInstance.getStocks()));
+                    stocksListView.setItems(items);
+
+                    // Add your sell functionality here
+                } else {
+                    showAlert(AlertType.ERROR, "Transaction", "Missing Stock Amount");
+                }
+            }
+             
             
             if (subTitleTradeDet.getText() == "" || inputField.getText() == "") {
                 showAlert(AlertType.ERROR, "Transaction", "Missing Quantity or Havent Selected Stock.");
@@ -827,13 +959,13 @@ public class mainpageTest extends Application {
         RowConstraints leaderGridRow0 = new RowConstraints();
         leaderGridRow0.setPercentHeight(25);
         RowConstraints leaderGridRow1 = new RowConstraints();
-        leaderGridRow1.setPercentHeight(20);
+        leaderGridRow1.setPercentHeight(23.5);
         RowConstraints leaderGridRow2 = new RowConstraints();
-        leaderGridRow2.setPercentHeight(20);
+        leaderGridRow2.setPercentHeight(23.3);
         RowConstraints leaderGridRow3 = new RowConstraints();
-        leaderGridRow3.setPercentHeight(20);
+        leaderGridRow3.setPercentHeight(23.3);
         RowConstraints leaderGridRow4 = new RowConstraints();
-        leaderGridRow4.setPercentHeight(15);
+        leaderGridRow4.setPercentHeight(5);
 
         leaderGrid.getRowConstraints().addAll(leaderGridRow0, leaderGridRow1, leaderGridRow2, leaderGridRow3, leaderGridRow4);
 
@@ -859,8 +991,9 @@ public class mainpageTest extends Application {
         p1N.setStyle("-fx-text-color: #1E1E1E;");
         StackPane plyr1Status = new StackPane();
         plyr1Status.setStyle("-fx-border-color: #DC5F00;");
-        p1S = new Label("Active");
+        p1S = new Label("Current Balance: 1000 \nPortfolio Value: 1000");
         p1S.setStyle("-fx-text-fill: #DC5F00");
+        
 
         plyr1Name.getChildren().addAll(p1N);
         plyr1Status.getChildren().addAll(p1S);
@@ -871,7 +1004,7 @@ public class mainpageTest extends Application {
         p2N.setStyle("-fx-text-color: #1E1E1E;");
         StackPane plyr2Status = new StackPane();
         plyr2Status.setStyle("-fx-border-color: #DC5F00;");
-        p2S = new Label("Inactive");
+        p2S = new Label("Current Balance: 1000 \nPortfolio Value: 1000");
         p2S.setStyle("-fx-text-fill: #DC5F00");
 
 
@@ -884,13 +1017,20 @@ public class mainpageTest extends Application {
         p3N.setStyle("-fx-text-color: #1E1E1E;");
         StackPane plyr3Status = new StackPane();
         plyr3Status.setStyle("-fx-border-color: #DC5F00;");
-        p3S = new Label("Active");
+        p3S = new Label("Current Balance: 1000 \nPortfolio Value: 1000");
         p3S.setStyle("-fx-text-fill: #DC5F00");
 
 
         plyr3Name.getChildren().addAll(p3N);
         plyr3Status.getChildren().addAll(p3S);
 
+        plyr1Status.setAlignment(Pos.TOP_LEFT);
+        plyr2Status.setAlignment(Pos.TOP_LEFT);
+        plyr3Status.setAlignment(Pos.TOP_LEFT);
+
+        p1S.setTranslateX(10);
+        p2S.setTranslateX(10);
+        p3S.setTranslateX(10);
 
 
 
@@ -911,12 +1051,12 @@ public class mainpageTest extends Application {
 
 
         // Robot Design 
-        StackPane roboFace = new StackPane();
+       /*  StackPane roboFace = new StackPane();
         Region roboDesign = new Region();
         roboDesign.setStyle("-fx-background-color:  #DC5F00;");
 
         leaderGrid.add(roboFace,0, 4, 1, 1);
-        leaderGrid.add(roboDesign,1, 4, 1, 1);
+        leaderGrid.add(roboDesign,1, 4, 1, 1);*/
 
         
 
@@ -960,6 +1100,12 @@ public class mainpageTest extends Application {
             marketButton.getStyleClass().clear(); // Clear existing styles
             marketButton.getStyleClass().addAll( "button-selected");
             marketPane.getStyleClass().add("mainpage-cellStyle");
+
+            //Enable
+            ctgryStackLabel.setVisible(true);
+            priceStackLabel.setVisible(true);
+            ctgrStackLabelOutput.setVisible(true);
+            priceStackLabelOutput.setVisible(true);
 
              //Button Text
              buySellButton.setText("Buy");
@@ -1023,6 +1169,12 @@ public class mainpageTest extends Application {
             homePane.getStyleClass().add("mainpage-cellStyle");
 
 
+            //Enable
+            ctgryStackLabel.setVisible(true);
+            priceStackLabel.setVisible(true);
+            ctgrStackLabelOutput.setVisible(true);
+            priceStackLabelOutput.setVisible(true);
+
             // Create colored content for homeButton
             
            
@@ -1047,6 +1199,10 @@ public class mainpageTest extends Application {
             profileButton.getStyleClass().clear();
             profileButton.getStyleClass().add("button");
         });
+
+
+
+
         
         profileButton.setOnAction(event -> {
             profileButton.getStyleClass().clear(); // Clear existing styles
@@ -1056,7 +1212,14 @@ public class mainpageTest extends Application {
             //Button Text
             buySellButton.setText("Sell");
 
+
+            //Disable Categories and Prices Label
+            ctgryStackLabel.setVisible(false);
+            priceStackLabel.setVisible(false);
+            ctgrStackLabelOutput.setVisible(false);
+            priceStackLabelOutput.setVisible(false);
             
+                    
             // Create colored content for profileButton
             StackPane profileContent = new StackPane();
             profileContent.setStyle("-fx-background-color: #1E1E1E;"); // Set background color
@@ -1065,9 +1228,9 @@ public class mainpageTest extends Application {
             profileContentGrid.setVgap(5);
 
             ColumnConstraints profileContentGridCol0 = new ColumnConstraints();
-            profileContentGridCol0.setPercentWidth(50);
+            profileContentGridCol0.setPercentWidth(40);
             ColumnConstraints profileContentGridCol1 = new ColumnConstraints();
-            profileContentGridCol1.setPercentWidth(50);
+            profileContentGridCol1.setPercentWidth(60);
 
             profileContentGrid.getColumnConstraints().addAll(profileContentGridCol0, profileContentGridCol1);
 
@@ -1078,12 +1241,16 @@ public class mainpageTest extends Application {
 
             profileContentGrid.getRowConstraints().addAll(profileContentGridRow0, profileContentGridRow1);
 
-            
-            ImageView profilePicture = new ImageView();
-            profilePicture.setFitWidth(150);
-            profilePicture.setFitHeight(150);
-            profilePicture.setImage(new Image(new File("src/main/java/com/example/profile_picture.png").toURI().toString()));
 
+            ImageView profilePicture = new ImageView();
+            profilePicture.setFitWidth(180);
+            profilePicture.setFitHeight(180);
+            profilePicture.setImage(new Image(new File("src/main/java/com/example/profile_picture.png").toURI().toString()));
+            
+            GridPane.setHgrow(profileContent, Priority.NEVER);
+            GridPane.setVgrow(profileContent, Priority.NEVER);
+            profileContent.setMinSize(250, 10);
+            profileContent.setMaxSize(600, Double.MAX_VALUE);
 
 
             StackPane profStackPane = new StackPane(); 
@@ -1093,25 +1260,65 @@ public class mainpageTest extends Application {
 
             // Username
             Label usernameLabel = new Label((String)this.curAccount.get("name"));
-            usernameLabel.setStyle("-fx-text-fill: #FFFFFF; -fx-font-size: 24;"); // White text, size 24
+            usernameLabel.setStyle("-fx-text-fill: #DC5F00; -fx-font-size: 40;"); // Set text color
 
             // Company ID
             Label companyIdLabel = new Label("Company ID: " + (String)this.curAccount.get("companyID"));
             companyIdLabel.setStyle("-fx-text-fill: #FFFFFF; -fx-font-size: 18;"); // White text, size 18
-            companyIdLabel.setTranslateY(20);
+            
+            // Total Investment
+            Label userInvestment = new Label("Investment Total: [placeholder]");
+            userInvestment.setStyle("-fx-text-fill: #FFFFFF; -fx-font-size: 18;"); // White text, size 18
+
+            // Current Account Cash
+            Label userCurrentCash = new Label("Current Account Cash: "+ balance);
+            userCurrentCash.setStyle("-fx-text-fill: #FFFFFF; -fx-font-size: 18;"); // White text, size 18
+
+            System.out.println(userCurrentCash);
 
 
-            StackPane profDetStackPane = new StackPane();
-            profDetStackPane.getChildren().addAll(companyIdLabel,usernameLabel);
+            GridPane profileDetailsGrid = new GridPane();
+            profileDetailsGrid.setVgap(2);
+            profileDetailsGrid.add(usernameLabel, 0, 0);
+            profileDetailsGrid.add(companyIdLabel, 0, 1);
+            profileDetailsGrid.add(userInvestment, 0, 2);
+            profileDetailsGrid.add(userCurrentCash, 0, 3);
 
-            // profDetStackPane.setStyle("-fx-background-color: yellow;");
 
+            // List view
             StackPane profListStackPane = new StackPane();
-            // profListStackPane.setStyle("-fx-background-color: green;");
+            stocksListView = new ListView<>();
+            stocksListView.getItems().addAll(formatStocks(mainpageTest.objProfileInstance.getStocks()));
 
+            stocksListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+                if (newValue != null) {
+                    System.out.println("Selected Stock: " + newValue);
+
+                    String regex = "^(.*?) = \\d+\\.0 units";
+                    Pattern pattern = Pattern.compile(regex);
+                    Matcher matcher = pattern.matcher(newValue);
+
+                    // Check if the matcher finds a match
+                    if (matcher.find()) {
+                        // Extract the company ID
+                        String stockVal = matcher.group(1); // Group 1 captures the (\d+) part
+                        curStockName = stockVal;
+                        subTitleTradeDet.setText("ITEM: " + stockVal);
+                    } else {
+                        System.out.println("No stock found in input.");
+                    }
+
+
+                   
+                    
+                    
+                }   
+            });
+
+            profListStackPane.getChildren().add(stocksListView);
 
             profileContentGrid.add(profStackPane, 0, 0);
-            profileContentGrid.add(profDetStackPane, 1, 0);
+            profileContentGrid.add(profileDetailsGrid, 1, 0);
             profileContentGrid.add(profListStackPane, 0, 1, 2, 1);
 
 
@@ -1136,13 +1343,16 @@ public class mainpageTest extends Application {
 
         //#endregion
         
+        StackPane mainStackpane = new StackPane();
+        mainStackpane.getChildren().add(grid);
 
-        
-
-        Scene scene = new Scene(grid, 900, 750);
+        Scene scene = new Scene(mainStackpane, 900, 850);
         scene.setCamera(new PerspectiveCamera());
         scene.getStylesheets().add(getClass().getResource("/com/example/styles.css").toExternalForm());
         
+        createOverlay(scene, mainStackpane);
+
+
         return scene;
     }
     //#endregion
@@ -1177,58 +1387,226 @@ public class mainpageTest extends Application {
     //#region Stock Values and Simulation Updates
     public void updateStockPane(String JSONdata) {
         System.out.println("Updating Stock Pane");
-        lineGraphRef.updateStockValue(JSONdata);
 
-        Double curDouble = lineGraphRef.getSpecificStockValue(curStockName);
-        System.out.println(curDouble);
-        //Based on curStockName update:
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
+        // Initialize Gson
+        Gson gson = new Gson();
 
-                priceLabelOutput.setText(Double.toString((double) Math.round((curDouble * 10000)) / 10000));
+        // Parse the JSON data
+        JsonArray jsonArray = JsonParser.parseString(JSONdata).getAsJsonArray();
+
+        // Select 3 random stocks from the JSON array
+        Random random = new Random();
+        int[] randomIndices = new int[3];
+        for (int i = 0; i < 3; i++) {
+            randomIndices[i] = random.nextInt(jsonArray.size());
+        }
+
+        // Update UI on JavaFX Application Thread
+        Platform.runLater(() -> {
+            for (int i = 0; i < 3; i++) {
+                JsonObject stockEntry = jsonArray.get(randomIndices[i]).getAsJsonObject();
+
+                // Extract stockName
+                String stockName = stockEntry.get("stockName").getAsString();
+                // Extract stockPrice
+                double stockPrice = stockEntry.get("stockPrice").getAsDouble();
+                // Extract price_fluctuation
+                double priceFluctuation = stockEntry.get("price_fluctuation").getAsDouble();
+
+                // Convert stock name to abbreviation (example method)
+                String stockAbbreviation = convertToAbbreviation(stockName);
+
+                // Update respective square and labels
+                if (i == 0) {
+                    updateSquare(square1, stockAbbreviation, priceFluctuation, stockPrice);
+                } else if (i == 1) {
+                    updateSquare(square2, stockAbbreviation, priceFluctuation, stockPrice);
+                } else if (i == 2) {
+                    updateSquare(square3, stockAbbreviation, priceFluctuation, stockPrice);
+                }
+
+                System.out.println("Stock Name: " + stockName + " [" + stockAbbreviation + "]");
+                System.out.println("Stock Price: " + stockPrice);
+                System.out.println("Price Fluctuation: " + priceFluctuation);
             }
+
+            // Update any other UI components
+            lineGraphRef.updateStockValue(JSONdata);
+
+            Double curDouble = lineGraphRef.getSpecificStockValue(curStockName);
+            System.out.println(curDouble);
+
+            // Update UI component on JavaFX Application Thread
+            priceLabelOutput.setText(Double.toString((double) Math.round((curDouble * 10000)) / 10000));
         });
+    }
+
+    // Example method to update a square with labels
+    private void updateSquare(StackPane square, String abbreviation, double fluctuation, double price) {
+        // Clear previous content if any
+        square.getChildren().clear();
+        square.setMinSize(85, 75);
+        square.setMaxSize(85, 75);
+
+        // Create labels
+        Label abbrvLabel = new Label("[" + abbreviation + "]");
+        Label flucLabel = new Label("FLC " + String.format("%.4f", fluctuation));
+        Label prcLabel = new Label("PRC " + String.format("%.2f", price));
+
+        // Style labels as needed
+        abbrvLabel.setStyle("-fx-font-size: 20px;");
+        flucLabel.setStyle("-fx-font-size: 14px;");
+        prcLabel.setStyle("-fx-font-size: 14px;");
+
+        // Create VBox to hold labels
+        VBox vbox = new VBox();
+        vbox.getChildren().addAll(abbrvLabel, flucLabel, prcLabel);
+
+        // Bind VBox size to square size
+        vbox.prefWidthProperty().bind(square.widthProperty());
+        vbox.prefHeightProperty().bind(square.heightProperty());
+
+        // Add VBox to square
+        square.getChildren().add(vbox);
+    }
+
+    // Example method to convert stock name to abbreviation
+    private String convertToAbbreviation(String stockName) {
+        String[] words = stockName.split(" ");
+        StringBuilder abbreviation = new StringBuilder();
+
+        for (String word : words) {
+            if (!word.isEmpty()) {
+                abbreviation.append(word.charAt(0));
+            }
+        }
+
+        return abbreviation.toString().toUpperCase();
     } 
 
     //#endregion
+    public static boolean endOfDay = false;
 
-    public void GetLeaderBoardFromPy(String list) {
+    public Boolean GetLeaderBoardFromPy(String list) {
         Gson gson = new Gson();
         Object[] leaderboard = gson.fromJson(list, Object[].class);
         String json = gson.toJson(leaderboard);
         
-        for (int i = 0; i < 3; i++) {
-            Map<String, Object> map = (Map<String, Object>) leaderboard[i];
-            final String name = (String) map.get("name");
-            final double amount = (double) map.get("amount");
-            final double cashBalance = (double) map.get("cash_balance");
-            final double totalInvestment = (double) map.get("total_investment");
-            final int index = i; // Create a final variable
+        if (endOfDay == false) {
+            //Show Top 3 
+            for (int i = 0; i < 3; i++) {
+                Map<String, Object> map = (Map<String, Object>) leaderboard[i];
+                final String name = (String) map.get("name");
+                final double amount = (double) map.get("amount");
+                final double cashBalance = (double) map.get("cash_balance");
+                final double totalInvestment = (double) map.get("total_investment");
+                final int index = i; // Create a final variable
 
-            
-            System.out.println("Name: " + name);
-            System.out.println("Amount: " + amount);
-            System.out.println("Cash Balance: " + cashBalance);
-            System.out.println("Total Investment: " + totalInvestment);
-            System.out.println();
+                
+                System.out.println("Name: " + name);
+                System.out.println("Amount: " + amount);
+                System.out.println("Cash Balance: " + cashBalance);
+                System.out.println("Total Investment: " + totalInvestment);
+                System.out.println();
 
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (index == 0) {
+                            p1N.setText(name);
+                            p1S.setText(String.format("Current Employee Balance: %.2f $HK\nTotal Investments: %.2f $HK", cashBalance, totalInvestment));
+                        } else if (index == 1) {
+                            p2N.setText(name);
+                            p2S.setText(String.format("Current Employee Balance: %.2f $HK\nTotal Investments: %.2f $HK", cashBalance, totalInvestment));
+                        } else if (index == 2) {
+                            p3N.setText(name);
+                            p3S.setText(String.format("Current Employee Balance: %.2f $HK\nTotal Investments: %.2f $HK", cashBalance, totalInvestment));
+                        }
+                    }
+                });
+            }
+
+            //Show all Top 10 Players 
+            // Show all Top 10 Players in ListView
             Platform.runLater(new Runnable() {
                 @Override
                 public void run() {
-                    if (index == 0) {
-                        p1N.setText(name);
-                        p1S.setText(Double.toString(cashBalance));
-                    } else if (index == 1) {
-                        p2N.setText(name);
-                        p2S.setText(Double.toString(cashBalance));
-                    } else if (index == 2) {
-                        p3N.setText(name);
-                        p3S.setText(Double.toString(cashBalance));
+                    listView = (ListView<String>) overlay.getChildren().get(0);
+                    listView.getItems().clear(); // Clear existing items
+
+                    for (int i = 0; i < leaderboard.length && i < 10; i++) {
+                        Map<String, Object> map = (Map<String, Object>) leaderboard[i];
+                        String name = (String) map.get("name");
+                        double cashBalance = (double) map.get("cash_balance");
+                        double totalInvestment = (double) map.get("total_investment");
+
+                        listView.getItems().add(String.format("Employee: %s \nCash Balance: %.2f $HK \nTotal Investments: %.2f $HK", name, cashBalance, totalInvestment));
                     }
                 }
             });
         }
+
+
+        return true;
+    }
+
+    public void newDayFunction(String data) {
+        System.out.println("Passed data "+ data);
+        leaderBoardListener();
+        simulateRoundEnd();
+
+    }
+    public static ListView<String> listView;
+    public static VBox overlay;
+    private TranslateTransition transitionUp;
+    private TranslateTransition transitionDown;
+    Label leaderBoardTitleLabel;
+
+    private void createOverlay(Scene scene, StackPane stackPane) {
+        overlay = new VBox(20);
+        overlay.setStyle("-fx-background-color: black; -fx-alignment: center; -fx-padding: 10px 10px;");
+        overlay.setPrefSize(scene.getWidth() * .5, scene.getHeight());
+    
+        // Add Performance Today title with inline CSS
+        /*leaderBoardTitleLabel = new Label("Performance Today");
+        leaderBoardTitleLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: white;"); // Inline CSS for font size and text color
+        overlay.getChildren().add(leaderBoardTitleLabel); // Add ListView directly to overlay*/
+
+        // Create a ListView for leaderboard
+        listView = new ListView<>();
+        overlay.getChildren().add(listView); // Add ListView directly to overlay
+    
+        Button closeButton = new Button("Close Daily Performance List");
+        closeButton.setOnAction(e -> closeOverlay());
+    
+        overlay.getChildren().add(closeButton); // Add close button
+    
+        stackPane.getChildren().add(overlay);
+    
+        // Initialize the overlay's position (off-screen at the bottom)
+        overlay.setTranslateY(scene.getHeight());
+    
+        // Set up the transitions
+        transitionUp = new TranslateTransition(Duration.seconds(1), overlay);
+        transitionUp.setToY(0);
+    
+        transitionDown = new TranslateTransition(Duration.seconds(1), overlay);
+        transitionDown.setToY(scene.getHeight());
+    }
+    
+    
+
+    
+    private void simulateRoundEnd() {
+        transitionUp.play();
+        fastClock.pauseClock();
+        endOfDay = true;
+    }
+
+    private void closeOverlay() {
+        transitionDown.play();
+        fastClock.resumeClock();
+        endOfDay = false;
     }
 
     // Method to update the alert text

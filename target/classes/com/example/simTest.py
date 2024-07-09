@@ -8,7 +8,7 @@ from threading import Condition
 
 
 class Player:
-    def __init__(self, name, amount):
+    def __init__(self, name, amount, user=False):
         self.transaction_cost = 0.0075  # Price for account transactions
         self.amount = amount
         self.name = name
@@ -19,6 +19,7 @@ class Player:
         self.cash_balance = amount
         self.total_investment = 0.0
         self.uncertainty_threshold = 1.0  # Threshold at which the player decides to sell
+        self.user = user  # Boolean to control uncertainty
 
     def getBal(self):
         return self.cash_balance
@@ -28,14 +29,13 @@ class Player:
     
     def getName(self):
         return self.name
-    
 
     def updateStockList(self, newPortfolio):
         self.portfolio = newPortfolio
         print(self.portfolio)
     
     def simulate(self, stockList):
-        if len(self.portfolio) >= 1:
+        if len(self.portfolio) >= 1 and not self.user:
             # Increase uncertainty at a random rate for each stock
             self.increase_uncertainty()
             # Decide whether to sell based on uncertainty level
@@ -47,8 +47,7 @@ class Player:
                 choice = stockList[random.randint(0, len(stockList) - 1)]
             if not self.buy_stock(choice, random.randint(1, 20)):
                 pass
-            
-    
+
     def buy_stock(self, stock, quantity):
         print(self.name + " bought " + str(quantity) + " " + stock.stockName)
 
@@ -65,7 +64,8 @@ class Player:
                 self.portfolio[stock.stockName] += quantity
             else:
                 self.portfolio[stock.stockName] = quantity
-                self.uncertainty[stock.stockName] = random.uniform(0, 0.2)
+                if not self.user:
+                    self.uncertainty[stock.stockName] = random.uniform(0, 0.2)
             # Update total investment
             self.total_investment += total_cost
             return True
@@ -95,7 +95,8 @@ class Player:
             # Remove stock from portfolio if quantity becomes zero
             if self.portfolio[stock.stockName] == 0:
                 del self.portfolio[stock.stockName]
-                del self.uncertainty[stock.stockName]
+                if not self.user and stock.stockName in self.uncertainty:
+                    del self.uncertainty[stock.stockName]
             return True
         else:
             return False
@@ -107,20 +108,18 @@ class Player:
                 self.sell_stock(stock, quantity)
     
     def increase_uncertainty(self):
-        #print(self.uncertainty)
-
-        for stock_name in self.uncertainty:
-            self.uncertainty[stock_name] += random.uniform(0.01, 0.1)
-            #print(f"Uncertainty level for {stock_name}: {self.uncertainty[stock_name]:.2f}")
+        if not self.user:
+            for stock_name in self.uncertainty:
+                self.uncertainty[stock_name] += random.uniform(0.01, 0.1)
 
     def check_uncertainty_and_sell(self, stockList):
-        for stock_name in list(self.uncertainty.keys()):
-            if self.uncertainty[stock_name] >= self.uncertainty_threshold:
-                for stock in stockList:
-                    if stock.stockName == stock_name:
-                        self.sell_stock(stock, self.portfolio[stock_name])
-                        break
-
+        if not self.user:
+            for stock_name in list(self.uncertainty.keys()):
+                if self.uncertainty[stock_name] >= self.uncertainty_threshold:
+                    for stock in stockList:
+                        if stock.stockName == stock_name:
+                            self.sell_stock(stock, self.portfolio[stock_name])
+                            break
 
 class Events:
     def __init__(self):
@@ -132,6 +131,7 @@ class Events:
         data = json.dumps([vars(obj) for obj in stock_list])
 
         try:
+            print(data)
             java_app.updateStockPane(data)
         except Exception as e:
             print(f"Error passing stock data: {e}")
@@ -221,6 +221,38 @@ class Stock:
         self.stockPrice = current_price * (1 + change_percent)
         return round(self.stockPrice, 2)
     
+class Leaderboard:
+    def __init__(self, players=None):
+        if players is None:
+            players = []
+        self.players = players
+
+    def add_player(self, player):
+        if not isinstance(self.players, list):
+            self.players = list(self.players)  # Convert to list if it's not already
+
+        if player not in self.players:
+            self.players.append(player)
+
+    def remove_player(self, player_name):
+        self.players = [player for player in self.players if player.name != player_name]
+
+    def update_amount(self, newPlayers, gateway):
+        for player in newPlayers:
+            if player not in self.players:
+                self.players.append(player)
+        print(self.players)
+        json_data = json.dumps(self.get_ranked_list(), default=lambda o: o.__dict__)
+        gateway.GetLeaderBoardFromPy(json_data)
+
+    def get_ranked_list(self):
+        return sorted(self.players, key=lambda player: player.cash_balance, reverse=True)
+
+    def print_leaderboard(self):
+        sorted_players = self.get_ranked_list()
+        for rank, player in enumerate(sorted_players, start=1):
+            print(f"{rank}. {player.name}: {player.amount}")
+    
 space_nasdaq = [
         Stock("Space Rocks", 100, "INFRA"),
         Stock("Hyper Accelerators", 90, "MILITARY"),
@@ -244,6 +276,29 @@ space_nasdaq = [
         Stock("Void Crystals", 280, "ENERGY")
 ]
 
+# Instantiate classes
+active_players = {
+    Player("John Doe", 10000),
+    Player("Alongy", 10000),
+    Player("Haijee", 10000),
+    Player("Bob", 10000),
+    Player("Samenta", 10000),
+    Player("Alice", 10000),
+    Player("Eve", 10000),
+    Player("Charlie", 10000),
+    Player("Grace", 10000),
+    Player("Michael", 10000),
+    Player("Olivia", 10000),
+    Player("Sophia", 10000),
+    Player("Liam", 10000),
+    Player("Emma", 10000),
+    Player("Noah", 10000)
+
+}
+
+leaderboard = Leaderboard(active_players)
+
+
 #Profile Entry Point
 class ProfileEntryPoint:
     def __init__(self, gateway):
@@ -256,8 +311,13 @@ class ProfileEntryPoint:
         self.profileList = None
         self.profileBal = None
 
+    def updateLeader(self):
+        for player_active in active_players:
+            player_active.sell_stocks(space_nasdaq)
+            print(player_active.getPort())
+
     def search_stock(self, stock_name):
-        #print(space_nasdaq)
+        print(stock_name)
         for stock in space_nasdaq:
             if stock.stockName == stock_name:
                 print("Stock Found")
@@ -283,6 +343,8 @@ class ProfileEntryPoint:
                 self.profileBal = self.player_profile.getBal()
                 self.profileList = self.player_profile.getPort()
 
+            if self.player_profile is not None:
+                leaderboard.add_player(self.player_profile)
 
             # Checks if player is still same player or if player doesnt exist
             if self.player_profile is None or self.player_profile.getName() != loaded["name"] :
@@ -321,11 +383,12 @@ class ProfileEntryPoint:
         return json.dumps(return_data)
     
     def instantiateProfile(self, name, bal, stock):
-        self.player_profile = Player(name, bal)
+        self.player_profile = Player(name, bal, True)
         self.player_profile.updateStockList(stock) # Get Stock from db
         print(f"Created new profile for {name} with amount {bal}")
         print("Profile already exists")
         print(self.player_profile.getName())
+        leaderboard.add_player(self.player_profile)
 
         return self.player_profile
 
@@ -343,31 +406,6 @@ class ProfileEntryPoint:
     class Java:
         implements = ["com.example.ProfileInterface"]
 
-class Leaderboard:
-    def __init__(self, players=None):
-        if players is None:
-            players = []
-        self.players = players
-
-    def add_player(self, player):
-        self.players.append(player)
-
-    def remove_player(self, player_name):
-        self.players = [player for player in self.players if player.name != player_name]
-
-    def update_amount(self, newPlayers, gateway):
-        self.players = newPlayers
-        print(self.players)
-        json_data = json.dumps(self.get_ranked_list(), default=lambda o: o.__dict__)
-        gateway.GetLeaderBoardFromPy(json_data)
-
-    def get_ranked_list(self):
-        return sorted(self.players, key=lambda player: player.cash_balance, reverse=True)
-
-    def print_leaderboard(self):
-        sorted_players = self.get_ranked_list()
-        for rank, player in enumerate(sorted_players, start=1):
-            print(f"{rank}. {player.name}: {player.amount}")
 
 
 
@@ -386,16 +424,8 @@ def main():
     # Connect to the Java GatewayServer
     java_gateway = JavaGateway()
     
-    # Instantiate classes
-    active_players = {
-        Player("John Doe", 10000),
-        Player("Alongy", 10000),
-        Player("Haijee", 10000),
-        Player("Bob", 10000),
-        Player("Samenta", 10000)
-    }
+    
 
-    leaderboard = Leaderboard(active_players)
 
     event_system = Events()
 
@@ -407,6 +437,7 @@ def main():
     
     #Initial 
     event_system.passStockData(space_nasdaq, java_gateway)
+    leaderboard.update_amount(active_players, java_gateway) # updates leaderboards every passed datastock
 
     while not stop_flag:
         for stock in space_nasdaq:
