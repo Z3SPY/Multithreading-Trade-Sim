@@ -138,6 +138,17 @@
     -fx-font-size: 35px;
 }
 
+.tutorial-btn {
+    -fx-background-color: #DC5F00;
+    -fx-text-fill: #1E1E1E;
+    -fx-border-color: #DC5F00;
+    -fx-font-size: 13px;
+    -fx-padding: 5 10 5 10;
+}
+
+.tutorial-btn:hover {
+    -fx-background-color: #FF7F2A;
+}
 
 /*TIME PANE*/
 .time {

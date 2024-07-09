@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -17,13 +18,17 @@ import javafx.util.Duration;
 import java.util.Random;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -61,6 +66,16 @@ public class mainpageTest extends Application {
     Label ctgrLabelOutput;
     Label subTitleTradeDet;
 
+    private final String[] tutorialContent = {
+        "The top bar shows your wallet balance and company ID.",
+        "Use the ISTO MARKET button to view and buy stocks.",
+        "The ISTO HOME button shows your personal dashboard.",
+        "The ISTO PROFILE button displays your account information and owned stocks.",
+        "The chart in the center shows stock performance.",
+        "Use the Trade Details section to buy or sell stocks.",
+        "The leaderboard on the right shows top performers."
+    };
+
     //private Py4JGatewayServer py4jServer;
 
     private TextField inputField;    
@@ -75,7 +90,45 @@ public class mainpageTest extends Application {
 
     }
     
+    private Button createTutorialButton() {
+        Button tutorialButton = new Button("Tutorial");
+        tutorialButton.getStyleClass().add("tutorial-btn");
+        tutorialButton.setOnAction(e -> showTutorial());
 
+        GridPane.setMargin(tutorialButton, new Insets(5, 0, 25, 0));
+
+        return tutorialButton;
+    }
+
+    private void showTutorial() {
+    Alert tutorial = new Alert(AlertType.INFORMATION);
+    tutorial.setTitle("ISTO SYSTEM Tutorial");
+    tutorial.setHeaderText("Welcome to ISTO SYSTEM!");
+    tutorial.getDialogPane().getStylesheets().add(getClass().getResource("/com/example/styles.css").toExternalForm());
+
+    // Create a TextArea to hold all the tutorial content
+    TextArea textArea = new TextArea(String.join("\n\n", tutorialContent));
+    textArea.setEditable(false);
+    textArea.setWrapText(true);
+    textArea.setPrefHeight(300);
+    textArea.setPrefWidth(400);
+
+    // Set the font size here
+    textArea.setStyle("-fx-font-size: 14px;"); // Adjust the size as needed
+
+    // Set the TextArea as the content of the dialog
+    tutorial.getDialogPane().setContent(textArea);
+
+    // Make the dialog resizable
+    tutorial.getDialogPane().setExpanded(true);
+    tutorial.getDialogPane().setExpandableContent(null);
+
+    // Only use a Close button
+    ButtonType closeButton = new ButtonType("Close", ButtonBar.ButtonData.CANCEL_CLOSE);
+    tutorial.getButtonTypes().setAll(closeButton);
+
+    tutorial.showAndWait();
+    }
     
 
     // JAVA TO PYTHON 
@@ -290,6 +343,10 @@ public class mainpageTest extends Application {
 
         /* =============================================  */
 
+        Button tutorialButton = createTutorialButton();
+        grid.add(tutorialButton, 0, 0); // Add the button to the top-left corner
+
+        /* =============================================  */
         StackPane homePane = new StackPane();
         homePane.getStyleClass().add("mainpage-cellStyle");
         midGridPane.add(homePane, 1, 0, 1, 1);
