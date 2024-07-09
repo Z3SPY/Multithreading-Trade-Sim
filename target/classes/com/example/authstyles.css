@@ -10,6 +10,7 @@
 }
 
 .reglbl-text {
+    -fx-font-family: "Post No Bills Colombo";
     -fx-font-size: 25px;
     -fx-text-fill: #DC5F00; /* Text color */
     -fx-font-weight: bold;

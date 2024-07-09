@@ -35,6 +35,8 @@ public class Profile {
         return this.stocks;
     }
 
+    
+
 
 
     public void updateProfileData(Float balance, Map<String, Float> stock) {
