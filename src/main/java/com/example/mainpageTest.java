@@ -8,6 +8,11 @@ import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.IOException;
+
+
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -204,7 +209,7 @@ public class mainpageTest extends Application {
         
         balance = (Float) this.curAccount.get("balance");
 
-
+        
         //Could be a problem?
         if (lineGraphRef == null) {
             lineGraphRef = new JavaFXLineGraph();
@@ -254,7 +259,35 @@ public class mainpageTest extends Application {
         mainStage.setScene(mainScene);
         mainStage.setResizable(false);
         mainStage.show();
+
+        new Thread(() -> runPythonScript("src/main/java/com/example/simTest.py")).start();
     }
+
+    private void runPythonScript(String scriptPath) {
+        try {
+            // Create a process builder for running the Python script
+            ProcessBuilder pb = new ProcessBuilder("python", scriptPath);
+            pb.redirectErrorStream(true);
+
+            // Start the process
+            Process process = pb.start();
+
+            // Capture and print the output of the script
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    System.out.println(line);
+                }
+            }
+
+            // Wait for the process to complete and check the exit code
+            int exitCode = process.waitFor();
+            System.out.println("Python script exited with code: " + exitCode);
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+    
     
 
     //#region MAIN SCENE FRONTEND
@@ -727,7 +760,6 @@ public class mainpageTest extends Application {
         lowerMiddlePane.getChildren().add(infoGridPane);
 
         //#endregion
-
 
 
         //#region Trade Details 

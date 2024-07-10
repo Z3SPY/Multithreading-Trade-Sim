@@ -410,10 +410,13 @@ class ProfileEntryPoint:
 
 
 def main():
+    callback_server_port = 25335
+    callback_server_params = CallbackServerParameters(port=callback_server_port)
+
     # Start the Py4J gateway for ProfileEntryPoint
 
     #Gate Way For JAVA TO PYTHON
-    profile_gateway = JavaGateway(callback_server_parameters=CallbackServerParameters())
+    profile_gateway = JavaGateway(callback_server_parameters=callback_server_params)
     listener = ProfileEntryPoint(profile_gateway)
     profile_gateway.entry_point.registerListener(listener)
 
@@ -422,6 +425,8 @@ def main():
 
 
     # Connect to the Java GatewayServer
+    # Replace with an available port if 25334 is in use
+    
     java_gateway = JavaGateway()
     
     

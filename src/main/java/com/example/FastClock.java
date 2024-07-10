@@ -88,8 +88,8 @@ public class FastClock {
         
 
         // Changed Seconds for debugging
-        KeyFrame keyFrame = new KeyFrame(Duration.seconds(0.1), e -> {
-            clockMinutes = clockMinutes+5;
+        KeyFrame keyFrame = new KeyFrame(Duration.seconds(1), e -> {
+            clockMinutes = clockMinutes+15;
             if (clockMinutes == 60) {
                 clockHours++;
                 clockMinutes = 0;
