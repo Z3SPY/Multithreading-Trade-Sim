@@ -565,9 +565,12 @@ public class mainpageTest extends Application {
         //#region Wallet Pane
         // Add tutorial button
         Button tutorialButton = createTutorialButton();
-        GridPane.setConstraints(tutorialButton, 0, 0); // Adjust these values as needed
-        grid.getChildren().add(tutorialButton);
+        tutorialButton.getStyleClass().add("tutorial-btn");
+        tutorialButton.setMaxWidth(Double.MAX_VALUE);
+        tutorialButton.setTranslateX(40);
 
+        HBox tutorialPane = new HBox(tutorialButton);
+        grid.add(tutorialPane, 0, 0, 2, 1); // Positioned at top-left
         StackPane walPane = new StackPane();
         walPane.getStyleClass().addAll("mainpage-cellStyle", "wallet");
 
