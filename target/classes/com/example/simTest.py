@@ -2,6 +2,8 @@ import json
 import time
 import numpy as np
 import random
+import signal
+import atexit
 from py4j.java_gateway import JavaGateway, CallbackServerParameters
 from threading import Condition
 
@@ -406,12 +408,16 @@ class ProfileEntryPoint:
     class Java:
         implements = ["com.example.ProfileInterface"]
 
+import signal
+import atexit
+
 
 
 
 def main():
     callback_server_port = 25335
     callback_server_params = CallbackServerParameters(port=callback_server_port)
+    # callback_server_params = CallbackServerParameters(port=25336)
 
     # Start the Py4J gateway for ProfileEntryPoint
 
@@ -478,3 +484,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+

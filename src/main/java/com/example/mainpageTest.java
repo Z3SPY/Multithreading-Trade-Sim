@@ -260,7 +260,7 @@ public class mainpageTest extends Application {
         mainStage.setResizable(false);
         mainStage.show();
 
-        new Thread(() -> runPythonScript("src/main/java/com/example/simTest.py")).start();
+        new Thread(() -> runPythonScript("src\\main\\java\\com\\example\\simTest.py")).start();
     }
 
     private void runPythonScript(String scriptPath) {
