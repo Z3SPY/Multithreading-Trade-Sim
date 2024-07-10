@@ -144,7 +144,7 @@
     -fx-text-fill: #1E1E1E;
     -fx-border-color: #DC5F00;
     -fx-font-size: 15px;
-    -fx-padding: 1px 25px;
+    -fx-padding: 1px 10px;
 }
 
 .tutorial-btn:hover {

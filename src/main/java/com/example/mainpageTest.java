@@ -567,10 +567,10 @@ public class mainpageTest extends Application {
         Button tutorialButton = createTutorialButton();
         tutorialButton.getStyleClass().add("tutorial-btn");
         tutorialButton.setMaxWidth(Double.MAX_VALUE);
-        tutorialButton.setTranslateX(40);
+        //tutorialButton.setTranslateX(40);
 
         HBox tutorialPane = new HBox(tutorialButton);
-        grid.add(tutorialPane, 0, 0, 2, 1); // Positioned at top-left
+        grid.add(tutorialPane, 0, 0, 1, 1); // Positioned at top-left
         StackPane walPane = new StackPane();
         walPane.getStyleClass().addAll("mainpage-cellStyle", "wallet");
 
