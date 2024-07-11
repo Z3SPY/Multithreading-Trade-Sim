@@ -96,6 +96,11 @@ public class mainpageTest extends Application {
     Label ctgrLabelOutput;
     Label subTitleTradeDet;
 
+
+    //Python Proces
+    private Process pythonProcess;
+
+
     private final String[] tutorialContent = {
         "Welcome to ISTO SYSTEM! This tutorial will guide you through the main features.",
         "The top-left shows your ISTO WALLET with your current balance and company ID.",
@@ -316,10 +321,10 @@ public class mainpageTest extends Application {
             pb.redirectErrorStream(true);
 
             // Start the process
-            Process process = pb.start();
+            pythonProcess = pb.start();
 
             // Capture and print the output of the script
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(pythonProcess.getInputStream()))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
                     System.out.println(line);
@@ -327,7 +332,7 @@ public class mainpageTest extends Application {
             }
 
             // Wait for the process to complete and check the exit code
-            int exitCode = process.waitFor();
+            int exitCode = pythonProcess.waitFor();
             System.out.println("Python script exited with code: " + exitCode);
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
@@ -1414,7 +1419,15 @@ public class mainpageTest extends Application {
     public void stop() throws Exception {
         super.stop();
         // Shutdown Py4J server when JavaFX application stops
-        gatewayServer.shutdown();
+        if (gatewayServer != null) {
+            gatewayServer.shutdown();
+        }
+         // Kill the Python process if it is running
+        if (pythonProcess != null && pythonProcess.isAlive()) {
+            pythonProcess.destroy();
+            pythonProcess.waitFor(); // Wait for the process to terminate
+            System.out.println("Python script terminated.");
+        }
     }
     //#endregion 
 

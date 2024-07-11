@@ -417,70 +417,51 @@ import atexit
 def main():
     callback_server_port = 25335
     callback_server_params = CallbackServerParameters(port=callback_server_port)
-    # callback_server_params = CallbackServerParameters(port=25336)
 
     # Start the Py4J gateway for ProfileEntryPoint
-
-    #Gate Way For JAVA TO PYTHON
     profile_gateway = JavaGateway(callback_server_parameters=callback_server_params)
     listener = ProfileEntryPoint(profile_gateway)
     profile_gateway.entry_point.registerListener(listener)
 
-
-    #END Gate Way For JAVA TO PYTHON
-
-
     # Connect to the Java GatewayServer
-    # Replace with an available port if 25334 is in use
-    
     java_gateway = JavaGateway()
-    
-    
-
 
     event_system = Events()
 
     count = 0
     tick_limit = 10
-   
-    
     stop_flag = False
-    
-    #Initial 
-    event_system.passStockData(space_nasdaq, java_gateway)
-    leaderboard.update_amount(active_players, java_gateway) # updates leaderboards every passed datastock
 
-    while not stop_flag:
-        for stock in space_nasdaq:
-            stock.simulate_stock_price(stock.stockPrice)
-            #print(stock.display())
+    try:
+        # Initial data passing
+        event_system.passStockData(space_nasdaq, java_gateway)
+        leaderboard.update_amount(active_players, java_gateway)
 
-        #print(f"Cash balance: ${player.cash_balance:.2f}")
-        #print(f"Portfolio: {player.portfolio}")
-        """for stock_name, uncertainty in player.uncertainty.items():
-            print(f"Uncertainty for {stock_name}: {uncertainty:.2f}")
-            print()"""
-        
-        for player in active_players:
-            player.simulate(space_nasdaq)
-            
-        time.sleep(1)
-        
-        count += 1
-        #print(f"TICKS TILL NEXT EVENT {tick_limit - count}")
-        
-        if count % 5 == 0:
-            #print("Passing stock data")
-            leaderboard.update_amount(active_players, java_gateway) # updates leaderboards every passed datastock
-            event_system.passStockData(space_nasdaq, java_gateway)
-        
-        if count >= tick_limit:
-            event_system.generate_random_event(space_nasdaq, java_gateway)
-            count = 0
+        while not stop_flag:
+            for stock in space_nasdaq:
+                stock.simulate_stock_price(stock.stockPrice)
 
-    # Shutdown the gateway servers
-    #profile_gateway.shutdown()
-    #java_gateway.close()
+            for player in active_players:
+                player.simulate(space_nasdaq)
+
+            time.sleep(1)
+            count += 1
+
+            if count % 5 == 0:
+                leaderboard.update_amount(active_players, java_gateway)
+                event_system.passStockData(space_nasdaq, java_gateway)
+
+            if count >= tick_limit:
+                event_system.generate_random_event(space_nasdaq, java_gateway)
+                count = 0
+
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+    finally:
+        # Shutdown the gateway servers
+        profile_gateway.shutdown()
+        java_gateway.close()
 
 if __name__ == "__main__":
     main()
